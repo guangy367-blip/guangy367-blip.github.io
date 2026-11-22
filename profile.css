@@ -1,0 +1,26 @@
+.cover-entry{display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;margin-top:clamp(12px,2.7vh,32px)}
+.cover-entry .cover-enter{margin:0}.cover-entry>span{font-size:12px;letter-spacing:.06em;color:#aaa79e}
+.cards .photo{aspect-ratio:auto;background:#171715}.cards .photo img{width:100%;height:auto;display:block;object-fit:contain}
+.cards:not(.list){align-items:start}.card:hover .photo img{transform:none}.card .card-enter{transition:color .2s}.card:hover .card-enter{color:#f58b72}
+.bio-intro{font-size:clamp(15px,1.08vw,18px);line-height:1.9;color:#d0cec6;max-width:42em;margin:18px 0}
+.discipline{line-height:1.75}.discipline span{color:#d4715b;padding:0 3px}
+.account-no{font-size:12px;color:#a9a69d;margin-top:5px;letter-spacing:.035em}
+.offers{border-block:1px solid var(--line);font-size:15px}.offers summary{display:flex;align-items:center;gap:12px;min-height:46px;cursor:pointer;list-style:none}.offers summary::-webkit-details-marker{display:none}
+.offers summary::after{content:"＋";color:var(--accent);margin-left:auto}.offers[open] summary::after{content:"−"}.offers summary small{color:var(--soft)}
+.offers ul{margin:.3rem 0 1.2rem;padding:0;list-style:none}.offers li{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 12px;margin:8px 0}.offers b{font-weight:500}.offers li span{color:#b1aea5;font-size:13px}
+.bio dl{margin-bottom:0}.profile-actions{flex-wrap:wrap;gap:12px 22px;margin-top:24px}.profile-actions>*{min-height:36px;display:inline-flex;align-items:center;gap:6px}.profile .portrait{align-self:start;aspect-ratio:4/4.8;max-height:660px}
+.channels{padding-block:clamp(48px,6vw,96px);border-top:1px solid var(--line)}.channel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid #413f37}.channel-link{position:relative;display:flex;flex-direction:column;justify-content:flex-start;min-width:0;padding:26px clamp(15px,2.5vw,46px) 22px 0;--tint:#e38d77;transition:background-color .25s}.channel-link+.channel-link{border-left:1px solid #373731;padding-left:clamp(15px,2.5vw,46px)}.channel-link:hover{background:#1c1b18}.channel-link:focus-visible,.offers summary:focus-visible{outline:2px solid #e68a71;outline-offset:3px}.channel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;letter-spacing:.12em;color:#c5c1b8}.channel-head span:before{content:"";width:15px;height:2px;margin:0 8px 4px 0;background:var(--tint);display:inline-block}.channel-head i{font:22px Arial,sans-serif;color:var(--tint);transition:transform .2s}.channel-link:hover .channel-head i{transform:translate(2px,-2px)}.douyin{--tint:#c4dbd5}.zcool{--tint:#d8ba6b}.channel-link strong{font-size:clamp(18px,1.7vw,34px);font-weight:500;line-height:1.4;margin:36px 0 6px}.channel-link p{font-size:14px;line-height:1.65;color:#b8b5ac;margin:0 0 27px}.channel-stat{margin-top:auto;font-size:13px;color:#c6c3bb}.channel-stat b{font-size:17px;font-weight:500;color:#f1eee5}.channel-stat em{font-style:normal;margin:0 6px;color:#787269}.channels-date{color:#a9a69d;font-size:12px;margin:12px 0 0}
+@media(max-width:760px){.cover-nav .channels-nav{display:none}.channel-grid{grid-template-columns:1fr}.channel-link,.channel-link+.channel-link{padding:22px 4px;border-left:none}.channel-link+.channel-link{border-top:1px solid #373731}.channel-link strong{margin-top:12px;font-size:23px}.channel-link p{margin-bottom:12px}.profile .portrait{width:100%;height:320px;aspect-ratio:auto}.cover-entry{margin-top:12px;gap:12px}.cover-entry>span{font-size:11px}.portrait img{height:110%;width:80%}}
+@media(max-width:420px){.bio dl>div{grid-template-columns:38px 1fr;gap:12px}.profile-actions{gap:8px 12px}.profile-actions>*{font-size:13px}.offers li{display:block}.offers li span{display:block}.cover-year{max-width:124px}.channel-link{min-height:155px}}
+@media(prefers-reduced-motion:reduce){.channel-link,.channel-head i{transition:none}}
+@media(max-width:760px) and (orientation:portrait){
+  .studio.folio-cover #badge-rig{--badge-w:150px;right:3%;width:170px;height:clamp(234px,30svh,278px)}
+  .cover-nav nav{gap:clamp(10px,3.3vw,16px)}
+  .cover-nav .channels-nav{display:inline-block}
+  .cover-foot .cover-year{line-height:1.4}
+}
+@media(max-height:480px) and (orientation:landscape){
+  .studio.folio-cover #badge-rig{--badge-w:126px;right:3%;width:158px;height:212px}
+  .folio-cover .badge-display{font-size:17px}
+  .folio-cover .badge-school{font-size:8px}
+}

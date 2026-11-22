@@ -1,0 +1,68 @@
+#honors{color:#eeeae2;border-top:1px solid #494742;padding-block:clamp(48px,6vw,95px);scroll-margin-top:24px;font-family:var(--sans,Arial,sans-serif)}
+#honors [hidden]{display:none!important}
+.honor-heading,.honor-tools,.honor-caption,.honor-page-nav,.honor-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.honor-heading{align-items:flex-end;margin-bottom:clamp(25px,3.6vw,48px)}
+#honors h2{margin:.6rem 0 0;font:450 clamp(2.05rem,4vw,4.4rem)/1.2 var(--sans,Arial,sans-serif);letter-spacing:-.055em}
+#honors h2 span{font:300 clamp(1.16rem,2vw,2.25rem)/1 var(--sans,Arial,sans-serif);color:#a9a69e;letter-spacing:-.04em;margin-left:.6rem}
+#honors button,#honors select,#honors input{font-family:inherit}
+.honor-switch,.honor-fold,.honor-scans{color:#eeeae2;background:none;border:0;font-size:.9rem;cursor:pointer}
+.honor-switch,.honor-fold{border-bottom:1px solid #969186;padding:.45rem 0}
+.honor-switch:hover,.honor-fold:hover,.honor-scans:hover{color:#f18a74;border-color:#d36b57}
+.honor-tools{justify-content:flex-start;flex-wrap:wrap;border-top:1px solid #67645c;padding:1rem 0}
+.honor-tools label,.honor-jump{display:flex;align-items:center;gap:.65rem;color:#bbb7ae;font-size:.85rem}
+.honor-tools select,.honor-tools input,.honor-jump select{background:#1e1e1b;color:#f1eee7;border:1px solid #57554c;border-radius:2px;font-size:.88rem;padding:.58rem .65rem;min-height:38px}
+.honor-tools input{width:clamp(160px,19vw,300px)}
+.honor-tools input::placeholder{color:#b2ada3}
+.honor-count{margin-left:auto;font-size:.8rem;color:#b3b0a8;font-variant-numeric:tabular-nums}
+.honor-records{list-style:none;padding:0;margin:0}
+.honor-records li{display:grid;grid-template-columns:minmax(95px,.65fr) minmax(0,3fr) minmax(95px,.68fr);gap:1rem;align-items:center;padding:clamp(18px,2.15vw,32px) 0;border-top:1px solid #464540}
+.honor-records li:last-child{border-bottom:1px solid #464540}
+.honor-date{font:350 clamp(.875rem,1.2vw,1.12rem)/1.3 var(--sans,Arial,sans-serif);letter-spacing:.025em;color:#b3b0a6;font-variant-numeric:tabular-nums}
+.honor-records h3,.honor-more-scans h3{font:450 clamp(1.13rem,1.6vw,1.65rem)/1.45 var(--sans,Arial,sans-serif);letter-spacing:-.02em;margin:0}
+.honor-records p{font-size:.93rem;color:#b8b4ab;line-height:1.6;margin:.32rem 0 0}
+.honor-scans{justify-self:end;text-align:left;padding:.55rem 0;text-underline-offset:.35em;text-decoration:underline;text-decoration-color:#69665e}
+.honor-scans:before{content:"";display:inline-block;width:7px;height:9px;box-sizing:border-box;border:1px solid #cb806e;border-radius:1px;margin-right:.48em}
+.honor-more-scans{margin:2rem 0;border-left:1px solid #665b50;padding-left:1.25rem}
+.honor-scan-groups{display:flex;flex-wrap:wrap;gap:.25rem 1.3rem;margin-top:.5rem}
+.honor-fold{margin-top:1.4rem}
+#honors .honor-empty{display:block;color:#c4bdb2;font-size:1rem}
+body.honor-modal-open{overflow:hidden}
+.honor-viewer{position:fixed;inset:0;width:100%;height:100%;height:100dvh;max-width:none;max-height:none;margin:0;border:0;padding:0 clamp(14px,3vw,48px);background:#121211;color:#eeece5}
+.honor-viewer[open]{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.honor-viewer::backdrop{background:#111110}
+.honor-dialog-head{padding:.7rem 0;border-bottom:1px solid #45433d}
+.honor-dialog-head h3{margin:.12rem 0 0;font:450 clamp(.94rem,1.35vw,1.35rem)/1.3 var(--sans,Arial,sans-serif);color:#f1eee6}
+.honor-dialog-type,.honor-jump span{color:#aca79c;font-size:.76rem}
+.honor-current-detail{color:#c8c1b0;margin:.22rem 0 0;font-size:clamp(.77rem,1vw,.92rem);line-height:1.32;overflow-wrap:anywhere}
+.honor-close{flex:none}
+.honor-viewer button{background:transparent;color:#f3f0ea;border:0;padding:.55rem .45rem;min-height:42px;cursor:pointer;font-size:.88rem}
+.honor-viewer button:hover:not(:disabled){color:#f5947e}
+.honor-viewer button:disabled{opacity:.34;cursor:default}
+.honor-screen{min-width:0;min-height:0;display:flex;overflow:auto;position:relative;overscroll-behavior:contain;scrollbar-width:thin}
+.honor-screen img{width:100%;height:100%;display:block;margin:auto;object-fit:contain;cursor:zoom-in}
+.honor-screen.at-size img{width:var(--scan-width);max-width:none;height:auto;flex:none;object-fit:fill;cursor:zoom-out}
+.honor-error{margin:auto;text-align:center;color:#c7c0b5}
+.honor-caption{flex-wrap:wrap;border-top:1px solid #45433d;padding:.6rem 0}
+.honor-jump{max-width:66%;min-width:0}.honor-jump span{white-space:nowrap}
+.honor-jump select{max-width:min(48vw,740px);text-overflow:ellipsis}
+.honor-page-nav{gap:.55rem}
+.honor-position{font-size:.85rem;color:#b7b3aa;white-space:nowrap;font-variant-numeric:tabular-nums}
+.honor-viewer .honor-zoom{border-left:1px solid #504d45;padding-left:1rem}
+@media(max-width:700px){
+ .honor-heading{gap:.75rem;align-items:flex-end}
+ #honors h2 span{display:block;margin:.45rem 0 0}
+ .honor-tools{gap:.6rem 1rem}
+ .honor-tools label{gap:.45rem}.honor-tools input{width:9rem}
+ .honor-count{margin:0}
+ .honor-records li{grid-template-columns:1fr auto;gap:.5rem 1rem;align-items:start}
+ .honor-records .honor-date{grid-column:1;grid-row:1;align-self:center}
+ .honor-records li>div{grid-column:1/-1;grid-row:2}
+ .honor-records .honor-scans{grid-column:2;grid-row:1;font-size:.8rem;padding:.2rem 0}
+ .honor-jump{max-width:100%;width:100%}.honor-jump select{flex:1;min-width:0;max-width:none}
+ .honor-caption{gap:.25rem;justify-content:center;padding:.5rem 0}
+ .honor-page-nav{gap:.5rem}
+}
+@media(prefers-reduced-motion:no-preference){
+ .honor-viewer[open] .honor-dialog-head{animation:honor-fade .24s ease both}
+ @keyframes honor-fade{from{opacity:.5;transform:translateY(-4px)}to{opacity:1;transform:none}}
+}

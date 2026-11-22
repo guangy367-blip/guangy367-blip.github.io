@@ -4,50 +4,95 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#10100f"><meta name="description" content="何星霆的文创设计作品集与个人简历。走近猴山、开柜抓现行、怪兽很灵和杜甫的屋顶又飞了。">
 <title>何星霆 · 文创设计师 | 文化与日常</title>
-<link rel="icon" href="media/stamp.svg" type="image/svg+xml"><link rel="stylesheet" href="atlas.css"><link rel="stylesheet" href="exhibition.css"><link rel="stylesheet" href="studio.css"><link rel="stylesheet" href="badge.css"><link rel="stylesheet" href="journey.css">
+<link rel="icon" href="media/stamp.svg" type="image/svg+xml"><link rel="stylesheet" href="atlas.css?v=1123e"><link rel="stylesheet" href="exhibition.css?v=1123e"><link rel="stylesheet" href="studio.css?v=1123e"><link rel="stylesheet" href="badge.css?v=1123e"><link rel="stylesheet" href="journey.css?v=1123e"><link rel="stylesheet" href="profile.css?v=1123e"><link rel="stylesheet" href="honors.css?v=1123e"><link rel="stylesheet" href="media-guard.css?v=1123e">
 <link rel="preload" href="media/signature.woff2" as="font" type="font/woff2" crossorigin>
-<script src="home.js" defer></script><script src="badge.js" defer></script><script src="journey.js" defer></script>
+<script src="camera.js?v=1123e" defer></script><script src="media-guard.js?v=1123e" defer></script><script src="honors-data.js?v=1123e" defer></script><script src="honors-certs.js?v=1123e" defer></script><script src="honors.js?v=1123e" defer></script><script src="home.js?v=1123e" defer></script><script src="badge.js?v=1123e" defer></script><script src="journey.js?v=1123e" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">跳到正文</a>
-<header class="mast wrap">
-<a href="#top" class="signature" aria-label="何星霆 首页"><span class="stamp" aria-hidden="true">何</span><span>何星霆<small>HE XINGTING</small></span></a>
-<nav aria-label="主导航"><a href="#works">代表作品</a><a href="#notes" class="nav-notes">手记</a><a href="#profile">个人简历</a><button class="contact-toggle" data-contact>联系我<span aria-hidden="true">＋</span></button></nav>
-</header>
 <main id="main">
-<section id="top" class="studio" aria-labelledby="hero-title">
-  <div class="studio-scene" aria-hidden="true"><picture><source media="(max-width:650px)" srcset="media/studio-compact.webp"><img src="media/studio-wide.webp" width="1920" height="960" fetchpriority="high" alt=""></picture></div>
-  <div class="studio-shade" aria-hidden="true"></div>
-  <div class="studio-frame"><div class="studio-kicker"><i></i> CULTURAL PRODUCT DESIGN <b>/</b> 2026</div>
-  <div class="studio-heading"><p class="job-title">文创设计师 <span>/</span> 平面设计</p><h1 id="hero-title">何星霆<span lang="en">He Xingting</span></h1>
-  <p class="voice">我把山石、民俗与古诗，<br>做成可以把玩和使用的日常器物。</p>
-  <div class="studio-actions"><a href="#works" class="primary">查看代表作品</a><a href="media/profile.pdf" target="_blank" rel="noopener" class="resume-link">阅读求职简历 <span>PDF</span></a></div></div>
-  <a class="scene-credit" href="case.html?p=monkey"><span>场景作品</span>猴山 · 磁吸互动摆件</a>
-  </div><div id="badge-rig"></div>
+<section id="top" class="studio folio-cover" data-camera="whole" aria-labelledby="hero-title">
+  <header class="cover-nav">
+    <a class="cover-signature" href="#top" aria-label="何星霆，返回封面"><span>何星霆</span><i></i><span lang="en">HE XINGTING</span></a>
+    <nav aria-label="主导航"><a href="#works">作品</a><a href="#profile">履历</a><a href="#channels" class="channels-nav">社交主页</a><button type="button" data-contact>联系</button></nav>
+  </header>
+  <div class="cover-plane">
+    <div class="studio-scene cover-ambient" aria-hidden="true"></div>
+    <button class="cover-art" type="button" aria-label="切换树枝与朱红绳的观察视角" title="切换观察视角">
+      <span class="cover-track"><span class="cover-tilt"><picture>
+        <source media="(max-width:650px)" srcset="media/hero-cover-sm.webp">
+        <img src="media/hero-cover.webp" width="1873" height="843" fetchpriority="high" alt="粗粝的分叉枝条上，绕着一束朱红色绳结" draggable="false">
+      </picture></span></span>
+    </button>
+  </div>
+  <div class="cover-heading">
+    <h1 id="hero-title" lang="en">portfolio</h1>
+    <p>文化与日常</p>
+    <div class="cover-entry"><a class="cover-enter" href="#works"><i aria-hidden="true"></i>浏览作品</a><span>何星霆 · 文创设计</span></div>
+  </div>
+  <div id="badge-rig"></div>
+  <div class="cover-foot">
+    <span class="cover-year" lang="en">Selected works <i></i> 2026</span>
+    <div class="camera-switch" role="group" aria-label="选择观察视角">
+      <button data-lens="whole" type="button" aria-pressed="true">全景</button>
+      <button data-lens="angle" type="button" aria-pressed="false">斜向</button>
+      <button data-lens="knot" type="button" aria-pressed="false">绳结特写</button>
+    </div>
+  </div>
+  <p class="camera-reader" aria-live="polite" aria-atomic="true"></p>
 </section>
-<div id="journey"></div>
+
 <section id="works" class="works wrap" aria-labelledby="works-title">
 <header class="section-head"><div><p class="eyebrow"><i></i> PROJECT INDEX</p><h2 id="works-title">作品索引<span lang="en">Selected projects</span></h2></div><div class="view-switch" aria-label="切换索引视图"><button data-view="tiles" aria-pressed="true">图像</button><button data-view="list" aria-pressed="false">列表</button></div></header>
 <div class="cards" id="cards">
-<a class="card" href="case.html?p=monkey"><div class="photo"><img src="media/card-monkey.webp" loading="lazy" decoding="async" alt="猴山的山石与灵猴磁吸摆件"></div><div class="card-copy"><p>山石意象 / 磁吸摆件</p><h3>猴山</h3><span class="card-en">Monkey Mountain</span></div><span class="card-enter">查看项目</span></a>
-<a class="card" href="case.html?p=cabinet"><div class="photo"><img src="media/card-cabinet.webp" loading="lazy" decoding="async" alt="开柜抓现行的角色与抽屉装置"></div><div class="card-copy"><p>民俗角色 / 抽屉叙事</p><h3>开柜抓现行</h3><span class="card-en">Caught in the Act</span></div><span class="card-enter">查看项目</span></a>
-<a class="card" href="case.html?p=beasts"><div class="photo"><img src="media/card-beasts.webp" loading="lazy" decoding="async" alt="东方瑞兽桌面陪伴系列"></div><div class="card-copy"><p>东方瑞兽 / 桌面陪伴</p><h3>怪兽很灵</h3><span class="card-en">Eastern Little Beasts</span></div><span class="card-enter">查看项目</span></a>
-<a class="card" href="case.html?p=dufu"><div class="photo"><img src="media/card-dufu.webp" loading="lazy" decoding="async" alt="杜甫与茅屋造型的纸巾盒"></div><div class="card-copy"><p>古典诗意 / 生活器物</p><h3>杜甫的屋顶又飞了</h3><span class="card-en">Roof Gone Again</span></div><span class="card-enter">查看项目</span></a>
+<a class="card" href="case.html?p=monkey"><div class="photo"><img src="media/gallery-monkey-01.webp" srcset="media/gallery-monkey-01-s.webp 720w, media/gallery-monkey-01.webp 1440w" sizes="(max-width:620px) 95vw, (max-width:1500px) 44vw, 750px" width="1440" height="811" loading="lazy" decoding="async" alt="猴山的山石与灵猴磁吸摆件"></div><div class="card-copy"><p>山石意象 / 磁吸摆件</p><h3>猴山</h3><span class="card-en">Monkey Mountain</span></div><span class="card-enter">查看项目</span></a>
+<a class="card" href="case.html?p=cabinet"><div class="photo"><img src="media/gallery-cabinet-01.webp" srcset="media/gallery-cabinet-01-s.webp 720w, media/gallery-cabinet-01.webp 1440w" sizes="(max-width:620px) 95vw, (max-width:1500px) 44vw, 750px" width="1440" height="768" loading="lazy" decoding="async" alt="开柜抓现行的角色与抽屉装置"></div><div class="card-copy"><p>民俗角色 / 抽屉叙事</p><h3>开柜抓现行</h3><span class="card-en">Caught in the Act</span></div><span class="card-enter">查看项目</span></a>
+<a class="card" href="case.html?p=beasts"><div class="photo"><img src="media/gallery-beasts-01.webp" srcset="media/gallery-beasts-01-s.webp 720w, media/gallery-beasts-01.webp 1440w" sizes="(max-width:620px) 95vw, (max-width:1500px) 44vw, 750px" width="1440" height="811" loading="lazy" decoding="async" alt="东方瑞兽桌面陪伴系列"></div><div class="card-copy"><p>东方瑞兽 / 桌面陪伴</p><h3>怪兽很灵</h3><span class="card-en">Eastern Little Beasts</span></div><span class="card-enter">查看项目</span></a>
+<a class="card" href="case.html?p=dufu"><div class="photo"><img src="media/gallery-dufu-01.webp" srcset="media/gallery-dufu-01-s.webp 720w, media/gallery-dufu-01.webp 1440w" sizes="(max-width:620px) 95vw, (max-width:1500px) 44vw, 750px" width="1440" height="812" loading="lazy" decoding="async" alt="杜甫与茅屋造型的纸巾盒"></div><div class="card-copy"><p>古典诗意 / 生活器物</p><h3>杜甫的屋顶又飞了</h3><span class="card-en">Roof Gone Again</span></div><span class="card-enter">查看项目</span></a>
 </div></section>
-<section id="notes" class="notes wrap" aria-labelledby="notes-title"><header><p class="eyebrow"><i></i> STUDIO NOTES</p><h2 id="notes-title">创作手记</h2></header><div>
-<details class="note" open><summary>山石的孔，怎样成为玩法？</summary><p>太湖石的洞口给猴子留出了攀爬、悬挂和相遇的位置。在《猴山》中，磁吸让这些关系可以随手重新排列。<a href="case.html?p=monkey">走进猴山</a></p></details>
-<details class="note"><summary>让抽屉承担一次揭幕</summary><p>《开柜抓现行》把角色的分工藏进柜子。打开抽屉的动作让观看发生在一个具体的瞬间。<a href="case.html?p=cabinet">查看角色与结构</a></p></details>
-<details class="note"><summary>把「风卷茅草」留在桌上</summary><p>茅屋的屋脊成为出纸口。抽出纸巾时，纸面就像被风卷起的茅草，诗里的动作也成为器物的用法。<a href="case.html?p=dufu">查看纸巾盒</a></p></details>
-</div></section>
-<section id="profile" class="profile"><div class="wrap profile-grid">
-<div class="portrait"><span class="portrait-type" aria-hidden="true">He<br><em>Xingting</em></span><img loading="lazy" decoding="async" src="media/profile.webp" alt="何星霆毕业肖像"></div>
-<div class="bio"><p class="eyebrow"><i></i> DESIGNER PROFILE</p><h2>何星霆</h2><p class="discipline">文创设计 · 平面设计</p>
-<dl><div><dt>教育</dt><dd>上海立达学院 · 视觉传达设计<small>2022.09 — 2026.06</small></dd></div>
-<div><dt>实习</dt><dd>上海领健医疗科技有限公司<small>2025.06 — 2025.09</small><p>品牌海报、活动主视觉与宣传物料延展，独立完成多套活动视觉方案。</p></dd></div>
-<div><dt>工具</dt><dd>Photoshop / Illustrator<br>Midjourney / Stable Diffusion</dd></div><div><dt>荣誉</dt><dd>中华设计奖金奖、未来设计师全国一等奖<small>上海市优秀毕业生</small></dd></div></dl>
-<div class="profile-actions"><a href="media/profile.pdf" download="何星霆_个人简介.pdf">下载个人简历 <span>PDF</span></a><button data-contact>联系我</button></div></div>
-</div></section>
+<div id="journey"></div>
+<section id="profile" class="profile" aria-labelledby="profile-title">
+  <div class="wrap profile-grid">
+    <div class="portrait"><span class="portrait-type" aria-hidden="true">He<br><em>Xingting</em></span><img loading="lazy" decoding="async" src="media/profile.webp" alt="何星霆的毕业肖像"></div>
+    <div class="bio">
+      <p class="eyebrow"><i></i> DESIGNER PROFILE</p>
+      <h2 id="profile-title">何星霆</h2>
+      <p class="discipline">文创设计师 <span>/</span> 中国平面设计师协会（CGDA）会员</p>
+      <p class="bio-intro">我喜欢从一个日常动作开始设计。打开抽屉、抽出纸巾，或移动桌上的摆件，都可以成为讲述东方故事的方式。我的实践涵盖角色 IP、文创产品和品牌视觉。</p>
+      <dl>
+        <div><dt>教育</dt><dd>上海立达学院 · 视觉传达设计<small>2022.09 — 2026.06　均分 92.08　上海市优秀毕业生</small></dd></div>
+        <div><dt>实习</dt><dd>上海领健医疗科技有限公司<small>2025.06 — 2025.09</small><p>独立完成多套活动主视觉，并延展至品牌海报与宣传物料。</p></dd></div>
+        <div><dt>工具</dt><dd>Photoshop、Illustrator、Midjourney、Stable Diffusion</dd></div>
+      </dl>
+      <details class="offers"><summary>硕士录取 <small>5 所院校</small></summary><ul>
+        <li><b>英国皇家艺术学院</b><span lang="en">Information Experience Design</span></li>
+        <li><b>伦敦艺术大学</b><span lang="en">Creative Computing</span></li>
+        <li><b>格拉斯哥艺术学院</b><span lang="en">Design Innovation and Interaction Design</span></li>
+        <li><b>利兹大学</b><span lang="en">Design</span></li>
+        <li><b>伦敦大学金史密斯学院</b><span lang="en">Computational Arts</span></li>
+      </ul></details>
+      <div class="profile-actions"><a href="#honors">查看荣誉与证书 ↓</a><a href="media/profile.pdf" target="_blank" rel="noopener">阅读个人简历 <span>PDF</span></a><button data-contact>联系我</button></div>
+    </div>
+  </div>
+</section>
+<section id="honors" class="wrap" aria-label="荣誉与证书"></section>
+<section id="channels" class="channels wrap" aria-labelledby="channels-title">
+  <header class="section-head"><div><p class="eyebrow"><i></i> ELSEWHERE</p><h2 id="channels-title">创作主页</h2></div></header>
+  <div class="channel-grid">
+    <a class="channel-link redbook" href="https://www.xiaohongshu.com/user/profile/65b393ef000000001600031d" target="_blank" rel="noopener noreferrer" aria-label="小红书，AIGC设计师-阳光，在新标签页打开">
+      <span class="channel-head"><span>小红书</span><i aria-hidden="true">↗</i></span><strong>AIGC设计师-阳光</strong><p>东方灵感、角色 IP 与文创产品。</p><span class="channel-stat"><b>1.2 万</b> 粉丝 <em> / </em> 9.1 万获赞与收藏</span><small class="account-no">小红书号 7842986782</small>
+    </a>
+    <a class="channel-link douyin" href="https://www.douyin.com/user/1163130036" target="_blank" rel="noopener noreferrer" aria-label="抖音，阳光 · 象外，在新标签页打开">
+      <span class="channel-head"><span>抖音</span><i aria-hidden="true">↗</i></span><strong>阳光 · 象外</strong><p>用数字影像重讲东方典故。</p><span class="channel-stat"><b>2,348</b> 粉丝 <em> / </em> 1.9 万获赞</span><small class="account-no">抖音号 1163130036</small>
+    </a>
+    <a class="channel-link zcool" href="https://www.zcool.com.cn/u/ZMTA0MjI0NzAw" target="_blank" rel="noopener noreferrer" aria-label="站酷，AIGC设计师一阳光，在新标签页打开">
+      <span class="channel-head"><span>站酷</span><i aria-hidden="true">↗</i></span><strong>AIGC设计师一阳光</strong><p>原创潮玩 IP 与产品设计的完整案例。</p><span class="channel-stat">浏览站酷作品 <em> / </em> ZCOOL</span>
+    </a>
+  </div>
+  <p class="channels-date">账号数据记录于 2026 年 11 月</p>
+</section>
 </main>
-<footer class="wrap"><span>© 2026 何星霆</span><a href="media/portfolio.pdf" download="文创设计作品集.pdf">下载完整作品集 · PDF</a><a href="#top">回到顶部 ↑</a></footer>
+<footer class="wrap"><span>© 2026 何星霆</span><a href="mailto:2100391483@qq.com">2100391483@qq.com</a><a href="#top">回到顶部 ↑</a></footer>
+
 <dialog id="contact"><div class="contact-inner"><button id="dismiss" aria-label="关闭联系方式">×</button><p class="eyebrow"><i></i> CONTACT</p><h2>联系何星霆</h2><p class="contact-label">电子邮箱</p><a class="mail" href="mailto:2100391483@qq.com">2100391483@qq.com</a><div class="dialog-actions"><a href="mailto:2100391483@qq.com">写邮件</a><button id="copy-email">复制邮箱</button></div><p role="status" id="copy-status"></p></div></dialog>
 </body></html>

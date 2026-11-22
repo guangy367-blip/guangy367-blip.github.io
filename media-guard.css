@@ -1,0 +1,7 @@
+img, picture, .photo, .cover-art, [data-plate] {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+

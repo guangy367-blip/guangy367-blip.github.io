@@ -1,21 +1,5 @@
 (() => {
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
-  const scene = document.querySelector(".studio-scene");
-  const studio = document.querySelector(".studio");
-  let frame = 0, x = 0, y = 0, active = true;
-  function paint() {
-    frame = 0;
-    if (!active || motion.matches || innerWidth < 760) return;
-    const scroll = Math.max(0, Math.min(1, -studio.getBoundingClientRect().top / studio.offsetHeight));
-    scene.style.transform = "translate3d(" + x + "px," + (y + scroll*16).toFixed(1) + "px,0) scale(" + (1.026 + scroll*.085).toFixed(3) + ")";
-  }
-  function queue(){if(!frame && active && !motion.matches)frame=requestAnimationFrame(paint);}
-  if ("IntersectionObserver" in window) {
-    const observer=new IntersectionObserver(([entry])=>{active=entry.isIntersecting;if(active)queue();});observer.observe(studio);
-  }
-  addEventListener("scroll",queue,{passive:true});
-  studio.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse")return;x=(.5-e.clientX/innerWidth)*8;y=(.5-e.clientY/innerHeight)*5;queue();});
-  studio.addEventListener("pointerleave",()=>{x=0;y=0;queue();});
   const modes = [...document.querySelectorAll("[data-view]")];
   modes.forEach(button => button.addEventListener("click",() => {
     document.querySelector("#cards").classList.toggle("list",button.dataset.view === "list");
