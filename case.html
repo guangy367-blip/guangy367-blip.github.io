@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10100f">
+  <title>项目展册 · 文化与日常</title>
+  <link rel="icon" href="media/stamp.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="case.css">
+  <script src="catalog.js" defer></script>
+  <script src="case.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#reader">跳至项目章节</a>
+  <header class="masthead">
+    <a class="brand" href="index.html"><span class="seal" aria-hidden="true">何</span><span>何星霆<small class="brand-english" lang="en">HE XINGTING</small></span></a>
+    <nav aria-label="主要导航"><a href="index.html#works">作品索引</a><a href="index.html#profile">个人简历</a></nav>
+  </header>
+  <main id="case-main" hidden>
+    <article>
+      <div class="lead wrap">
+        <div class="cover-type">
+          <p class="category" id="category"></p>
+          <h1 id="title"></h1>
+          <p class="translation" id="english" lang="en"></p>
+          <p class="intro" id="intro"></p>
+          <a class="read" href="#reader"><span class="folio-icon" aria-hidden="true"></span>展开项目展册</a>
+        </div>
+        <figure class="cover-photo"><img id="cover" fetchpriority="high" width="1200" height="900" alt=""></figure>
+        <svg class="thread" viewBox="0 0 900 60" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 48C120 58 177 20 292 23S459 60 498 40C531 22 494 10 492 29S578 55 669 26S796 14 910 10" fill="none" stroke="currentColor" vector-effect="non-scaling-stroke"/></svg>
+      </div>
+      <div class="reader wrap" id="reader" tabindex="-1">
+        <aside class="contents" aria-label="本项目章节">
+          <div class="contents-head"><span>章节索引</span><i lang="en">Index</i></div>
+          <nav class="chapter-links" id="chapters" aria-label="章节列表"></nav>
+          <label class="chapter-picker"><span>当前章节</span><select id="mobile-chapters" aria-label="选择章节"></select></label>
+        </aside>
+        <div id="pages" class="pages"></div>
+      </div>
+    </article>
+    <footer class="exit wrap">
+      <a class="next-case" id="next-case"><img id="next-cover" alt="" width="320" height="240" loading="lazy"><span><small>下一件作品</small><strong id="next-title"></strong></span></a>
+      <a class="back-index" href="index.html#works">返回作品目录</a>
+    </footer>
+  </main>
+  <p id="missing" class="missing wrap" hidden>当前项目无法打开。<a href="index.html#works">返回作品目录</a></p>
+  <noscript><p class="wrap">请启用 JavaScript 浏览项目展册，或<a href="index.html">返回首页</a>。</p></noscript>
+  <dialog id="viewer" aria-label="作品原稿大图">
+    <header class="viewer-head"><p id="plate-name"></p><button type="button" id="close-viewer" aria-label="关闭大图">关闭<span class="close-mark" aria-hidden="true"></span></button></header>
+    <div class="viewport" id="viewport" tabindex="0" aria-label="原稿图像"><img id="plate" alt=""></div>
+    <footer class="viewer-foot">
+      <button id="prev-plate" type="button">上一幅</button>
+      <span class="counter" id="count" role="status"></span>
+      <button id="next-plate" type="button">下一幅</button>
+      <button id="zoom" type="button" aria-pressed="false">放大细看</button>
+    </footer>
+  </dialog>
+</body>
+</html>
