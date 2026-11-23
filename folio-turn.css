@@ -1,5 +1,5 @@
 /* A short sheet transition connects the index to the continuous artwork reader. */
-@view-transition{navigation:auto}
+/* Each document opts in before external styles load. */
 @media(prefers-reduced-motion:no-preference){
  ::view-transition-old(root){animation:folio-leave .31s ease-out both}
  ::view-transition-new(root){animation:folio-open .38s cubic-bezier(.21,.73,.23,1) both}
