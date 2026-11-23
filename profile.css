@@ -1,5 +1,7 @@
 .cover-entry{display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;margin-top:clamp(12px,2.7vh,32px)}
 .cover-entry .cover-enter{margin:0}.cover-entry>span{font-size:12px;letter-spacing:.06em;color:#aaa79e}
+.cover-play{display:inline-flex;gap:5px;align-items:center;min-height:36px;pointer-events:auto;font-size:13px;color:#c5bdae;text-decoration:underline;text-underline-offset:5px;text-decoration-color:#625b50}
+.cover-play:hover,.cover-play:focus-visible{color:#f4e2cd}
 .cards .photo{aspect-ratio:auto;background:#171715}.cards .photo img{width:100%;height:auto;display:block;object-fit:contain}
 .cards:not(.list){align-items:start}.card:hover .photo img{transform:none}.card .card-enter{transition:color .2s}.card:hover .card-enter{color:#f58b72}
 .bio-intro{font-size:clamp(15px,1.08vw,18px);line-height:1.9;color:#d0cec6;max-width:42em;margin:18px 0}
@@ -24,3 +26,30 @@
   .folio-cover .badge-display{font-size:17px}
   .folio-cover .badge-school{font-size:8px}
 }
+
+#contact{width:min(540px,94vw);max-height:94dvh;overflow:auto;margin:auto;color:#e9e3da;background:#171815;border:1px solid #524f45}
+#contact .contact-inner{padding:44px clamp(14px,2.6vw,30px) 14px}
+#contact #dismiss{right:9px;top:1px;width:40px;height:40px;color:#dbd6ca;line-height:1}
+.calling-card{color:#302d27;background:#eee8d9;padding:clamp(15px,3vw,29px);box-shadow:0 3px 14px #0003}
+.calling-head,.calling-mail{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.calling-head{padding-bottom:12px;border-bottom:1px solid #b4ad9c;color:#655f52;font-size:12px;letter-spacing:.12em}
+.calling-head [lang=en]{font:500 12px/1 Arial,sans-serif;letter-spacing:.15em}
+.calling-body{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:24px 0}
+#contact .calling-body h2{margin:0;color:#25241e;font:500 clamp(36px,7.6vw,62px)/1.12 "Songti SC",SimSun,serif;letter-spacing:.045em}
+.calling-body p{margin:10px 0 0;font-size:clamp(11px,2.4vw,14px);color:#5d5648}
+.calling-seal{display:grid;justify-items:center;gap:5px;padding:5px;border:0;background:transparent;color:#a43f2d}
+.seal-print{width:48px;height:52px;display:grid;place-content:center;text-align:center;transform:rotate(-6deg);color:#a43f2d;border:2px solid currentColor;outline:1px solid currentColor;outline-offset:-5px;border-radius:4px 5px 3px 6px;font:600 28px/1 "Songti SC",SimSun,serif}
+.seal-print[data-shape]{font-size:21px;letter-spacing:.02em}
+.seal-print[data-shape=beasts],.seal-print[data-shape=dufu]{border-radius:48%;height:47px}
+.seal-print[data-shape=cabinet],.seal-print[data-shape=dufu]{background:#aa4a37;color:#f4eee0;border-color:#aa4a37}
+.seal-label{font-size:11px;color:#804135;letter-spacing:.08em}
+.calling-mail{border-top:1px solid #b4ad9c;padding-top:12px}
+#contact .calling-mail .mail{color:#322f28;font:500 clamp(14px,3vw,19px)/1.4 Arial,sans-serif}
+.calling-mail button{font-size:12px;padding:6px 0;color:#5c554a;white-space:nowrap}
+.calling-actions{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap;margin-top:14px}
+.calling-actions a{min-height:38px;display:inline-flex;align-items:center;gap:6px;color:#dbd6c8;font-size:14px;text-decoration:underline;text-underline-offset:.38em}
+.calling-actions [hidden]{display:none}
+.calling-actions .calling-project{font-size:12px;margin-left:auto}
+.calling-actions .calling-save{padding:4px 11px;background:#e6dfd1;color:#26241f;text-decoration:none}
+#contact #copy-status{margin:7px 0 0;min-height:1.35em;color:#c6bca9}
+@media(max-width:380px){.calling-body{padding:20px 0}.calling-card{padding:13px}.seal-print{width:42px;height:46px}.calling-actions{gap:5px 10px}}

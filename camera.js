@@ -37,7 +37,6 @@
       panel.setAttribute("aria-hidden",String(i!==index));
     });
     reader.textContent="当前视角为"+controls[index].textContent;
-    art.setAttribute("aria-label",reader.textContent+"，切换到"+controls[(index+1)%controls.length].textContent);
     hint.textContent=index===2?"继续浏览作品":"向下滚动换镜";
   }
   function paint() {
@@ -103,7 +102,6 @@
       jump(next);
     });
   });
-  art.addEventListener("click",()=>jump((active+1)%controls.length));
   cue.addEventListener("click",event=>{
     if (active===2 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();

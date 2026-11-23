@@ -56,12 +56,11 @@
       <button class="honor-fold" type="button" hidden>收起档案</button>
       <dialog class="honor-viewer" aria-labelledby="honor-gallery-title"><header class="honor-dialog-head"><div><span class="honor-dialog-type">证书档案</span><h3 id="honor-gallery-title"></h3><p class="honor-current-detail" aria-live="polite"></p></div><button class="honor-close" type="button">关闭</button></header>
         <div class="honor-screen" tabindex="0" aria-label="证书图像"><img alt=""><span class="honor-error" role="status" hidden>这张证书未能载入。</span></div>
-        <div class="honor-caption"><label class="honor-jump"><span>当前证书</span><select aria-label="跳至同组其他证书"></select></label><div class="honor-page-nav"><button type="button" class="honor-prev">上一张</button><span role="status" class="honor-position"></span><button type="button" class="honor-next">下一张</button><button type="button" class="honor-zoom" aria-pressed="false">放大</button></div></div></dialog>`;
+        <div class="honor-caption"><label class="honor-jump"><span>当前证书</span><select aria-label="跳至同组其他证书"></select></label><div class="honor-page-nav"><button type="button" class="honor-prev">上一张</button><span role="status" class="honor-position"></span><button type="button" class="honor-next">下一张</button></div></div></dialog>`;
     const $=s=>root.querySelector(s);
     const sw=$(".honor-switch"), tools=$(".honor-tools"), year=tools.querySelector("select"),
       search=tools.querySelector("input"), list=$(".honor-records"),extra=$(".honor-more-scans"),
-      dlg=$(".honor-viewer"),img=$(".honor-screen img"),screen=$(".honor-screen"),
-      jump=$(".honor-jump select"), zoom=$(".honor-zoom");
+      dlg=$(".honor-viewer"),img=$(".honor-screen img"),jump=$(".honor-jump select");
     const textEl=(tag,text)=>{const el=document.createElement(tag);el.textContent=text;return el};
     let expanded=false,active=[],index=0,opener;
     const defaults=[
@@ -70,11 +69,6 @@
     ].filter(Boolean);
     const years=[...new Set(rows.map(r=>r.year))].sort((a,b)=>/^\d/.test(b)&&/^\d/.test(a)?b.localeCompare(a):/^\d/.test(a)?-1:/^\d/.test(b)?1:a.localeCompare(b));
     year.add(new Option("全部年份",""));years.forEach(y=>year.add(new Option(y,y)));
-    function setZoom(on) {
-      screen.classList.toggle("at-size",on);
-      zoom.textContent=on?"适应屏幕":"放大";zoom.setAttribute("aria-pressed",String(on));
-      if(!on){screen.scrollTop=0;screen.scrollLeft=0}
-    }
     const labelFor=c=>[c.year,c.title,c.level,c.work && "《"+c.work+"》"].filter((v,i,arr)=>v && arr.indexOf(v)===i).join(" · ");
     function selectImage(i) {
       if(i<0||i>=active.length)return;
@@ -82,9 +76,8 @@
       $(".honor-current-detail").textContent=[cert.year,cert.level,cert.work && "《"+cert.work+"》"].filter(Boolean).join(" · ");
       img.width=cert.width;img.height=cert.height;img.alt=labelFor(cert)||cert.group;
       img.hidden=false;$(".honor-error").hidden=true;img.src=cert.path;
-      screen.style.setProperty("--scan-width",Math.max(cert.width,Math.round(screen.clientWidth*1.15))+"px");
       $(".honor-prev").disabled=i===0;$(".honor-next").disabled=i===active.length-1;
-      $(".honor-position").textContent=(i+1)+" / "+active.length;jump.value=String(i);setZoom(false);
+      $(".honor-position").textContent=(i+1)+" / "+active.length;jump.value=String(i);
     }
     function gallery(button,files,match) {
       active=files;opener=button;jump.replaceChildren();
@@ -140,11 +133,9 @@
     $(".honor-prev").addEventListener("click",()=>selectImage(index-1));
     $(".honor-next").addEventListener("click",()=>selectImage(index+1));
     $(".honor-close").addEventListener("click",()=>dlg.close());
-    zoom.addEventListener("click",()=>setZoom(!screen.classList.contains("at-size")));
-    img.addEventListener("click",()=>zoom.click());
     img.addEventListener("error",()=>{img.hidden=true;$(".honor-error").hidden=false});
     dlg.addEventListener("keydown",e=>{
-      if(e.target===jump || screen.classList.contains("at-size") || e.altKey || e.ctrlKey || e.metaKey)return;
+      if(e.target===jump || e.altKey || e.ctrlKey || e.metaKey)return;
       if(e.key==="ArrowLeft" || e.key==="ArrowRight"){e.preventDefault();selectImage(index+(e.key==="ArrowLeft"?-1:1))}
     });
     dlg.addEventListener("close",()=>{document.body.classList.remove("honor-modal-open");img.removeAttribute("src");opener?.focus({preventScroll:true})});

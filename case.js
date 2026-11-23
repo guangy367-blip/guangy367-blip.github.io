@@ -7,8 +7,7 @@
 
   const entries = [], plates = [], groups = new Map();
   const mobile = matchMedia("(max-width:780px)");
-  const viewer = $("viewer"), viewport = $("viewport"), plate = $("plate");
-  let current = -1, positions = [], frame = 0, activePlate = -1, opener = null, zoomed = false;
+  let current = -1, positions = [], frame = 0;
 
   function node(tag, className, text) {
     const result = document.createElement(tag);
@@ -72,14 +71,10 @@
       const firstPlate = plates.length;
       for (const info of section.images) {
         const img = node("img");img.width=info.w;img.height=info.h;img.alt=info.alt||section.title;img.decoding="async";img.draggable=false;
-        const button = node("button","plate-thumb");button.type="button";
-        button.setAttribute("aria-label","放大查看："+work.title+" · "+section.title);button.setAttribute("aria-haspopup","dialog");
-        button.style.aspectRatio = info.w + " / " + info.h;
-        const plateIndex = plates.length;
-        button.dataset.plate=plateIndex;
-        plates.push({index,info,img,button,loaded:false});
-        button.addEventListener("click",()=>openPlate(plateIndex));
-        button.append(img);entry.append(button);
+        img.dataset.plate = plates.length;
+        img.style.aspectRatio = info.w + " / " + info.h;
+        plates.push({info,img,loaded:false});
+        entry.append(img);
       }
       entries.push({key,number,entry,link,firstPlate,title:section.title});
       $("pages").append(entry);
@@ -119,6 +114,8 @@
     const sightline=window.scrollY+chromeHeight()+Math.min(100,innerHeight*.12);
     let lo=0,hi=entries.length;
     while(lo+1<hi){const mid=(lo+hi)>>1;if(positions[mid]<=sightline)lo=mid;else hi=mid;}
+    // A short final board can be fully visible before its top reaches the reading line.
+    if (window.scrollY > 0 && window.scrollY + innerHeight >= document.documentElement.scrollHeight - 1) lo=entries.length-1;
     mark(lo);setAddress("replaceState",lo);
     const group=groups.get(entries[lo].key);
     const start=positions[group.start], end=positions[group.start+group.count] ?? ($("pages").getBoundingClientRect().bottom+scrollY);
@@ -149,7 +146,7 @@
         loadImage(plates[Number(change.target.dataset.plate)]);lazy.unobserve(change.target);
       }
     },{rootMargin:mobile.matches?"45% 0px":"80% 0px"});
-    plates.forEach(item=>lazy.observe(item.button));
+    plates.forEach(item=>lazy.observe(item.img));
   } else {
     // Native lazy-loading fallback for browsers without IntersectionObserver.
     plates.forEach(item=>{item.img.loading="lazy";loadImage(item)});
@@ -159,44 +156,4 @@
   addEventListener("popstate",()=>jump(resolvedEntry(),false));
   addEventListener("pageshow",()=>{measure();schedule()});
 
-  function setZoom(on,point={x:.5,y:.5}) {
-    zoomed=on;viewport.classList.toggle("detail",on);$("zoom").setAttribute("aria-pressed",String(on));
-    $("zoom").textContent=on?"适应屏幕":"放大细看";
-    if(!on){viewport.scrollTo(0,0);return}
-    const info=plates[activePlate].info;
-    const fit=Math.min(viewport.clientWidth/info.w,viewport.clientHeight/info.h);
-    viewport.style.setProperty("--zoom-width",Math.max(info.w,Math.ceil(info.w*fit*1.75))+"px");
-    viewport.scrollTo(plate.clientWidth*point.x-viewport.clientWidth/2,plate.clientHeight*point.y-viewport.clientHeight/2);
-  }
-  function showPlate(index) {
-    if(!plates[index])return;
-    activePlate=index;
-    const item=plates[index], r=entries[item.index];
-    plate.alt=item.info.alt;plate.width=item.info.w;plate.height=item.info.h;plate.src=item.info.src;
-    $("plate-name").textContent=catalog[r.key].title+" / "+r.title;$("count").textContent=(index+1)+" / "+plates.length;
-    $("prev-plate").disabled=index===0;$("next-plate").disabled=index===plates.length-1;setZoom(false);
-  }
-  function openPlate(index) {
-    opener=plates[index].button;showPlate(index);
-    viewer.showModal();document.body.classList.add("modal-open");$("close-viewer").focus({preventScroll:true});
-  }
-  $("close-viewer").addEventListener("click",()=>viewer.close());
-  $("prev-plate").addEventListener("click",()=>showPlate(activePlate-1));
-  $("next-plate").addEventListener("click",()=>showPlate(activePlate+1));
-  $("zoom").addEventListener("click",()=>setZoom(!zoomed));
-  viewer.addEventListener("close",()=>{
-    document.body.classList.remove("modal-open");plate.removeAttribute("src");
-    opener?.focus({preventScroll:true});measure();schedule();
-  });
-  viewer.addEventListener("keydown",e=>{
-    if(e.altKey||e.ctrlKey||e.metaKey||zoomed)return;
-    if(["ArrowLeft","ArrowRight"].includes(e.key)){e.preventDefault();showPlate(activePlate+(e.key==="ArrowRight"?1:-1))}
-  });
-  plate.addEventListener("click",e=>{
-    if(zoomed){setZoom(false);return}
-    const info=plates[activePlate].info,box=plate.getBoundingClientRect();
-    const s=Math.min(box.width/info.w,box.height/info.h),w=info.w*s,h=info.h*s;
-    const point={x:(e.clientX-box.left-(box.width-w)/2)/w,y:(e.clientY-box.top-(box.height-h)/2)/h};
-    if(point.x>=0&&point.x<=1&&point.y>=0&&point.y<=1)setZoom(true,point);
-  });
 })();
