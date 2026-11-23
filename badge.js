@@ -40,7 +40,7 @@
       <path d="M-4-16q-1-2 0-3M4-14 3-5" stroke="#eeebe1" stroke-width="1"/>
       <rect x="-3" y="-27" width="6" height="4.5" rx="1.4" fill="url(#rig-metal)"/>
     </g></svg>
-    <button type="button" class="badge-control" aria-pressed="false" aria-label="翻到挂牌背面">拖动挂牌 · 点击翻面</button>`;
+    <button type="button" class="badge-control" aria-pressed="false" aria-label="翻到挂牌背面">挂牌翻面</button>`;
 
   const body = rig.querySelector(".badge-body");
   const mount = rig.querySelector(".badge-mount");
@@ -91,7 +91,11 @@
     cordX=cordEntry();
     // Let the print settle under the cord. The anchor and its weighted snap
     // can then hang nearly plumb through the gap between navigation labels.
-    anchor+=clamp(cordX+3.5*metalScale-anchor,-40,40);
+    // The chain can enter through a gap in the navigation while the print stays on the page.
+    const pageWidth=document.documentElement.clientWidth;
+    const sideMargin=bw*.68+8;
+    const desired=anchor+clamp(cordX+3.5*metalScale-anchor,-40,40);
+    anchor=clamp(desired,sideMargin-rig.offsetLeft,pageWidth-sideMargin-rig.offsetLeft);
     const centre=rig.getBoundingClientRect().left+anchor;
     leftReach=Math.max(22,Math.min(rest*.96,centre-bw*.52-8));
     rightReach=Math.max(22,Math.min(rest*.96,innerWidth-centre-bw*.52-8));
@@ -204,7 +208,7 @@
     front.setAttribute("aria-hidden",String(isBack));back.setAttribute("aria-hidden",String(!isBack));
     control.setAttribute("aria-pressed",String(isBack));
     control.setAttribute("aria-label",isBack?"翻回挂牌正面":"翻到挂牌背面，查看服务客户");
-    control.textContent=isBack?"翻回正面":"拖动挂牌 · 点击翻面";
+    control.textContent=isBack?"翻回正面":"挂牌翻面";
   }
   function flip(direction=1){
     halfTurn+=direction;

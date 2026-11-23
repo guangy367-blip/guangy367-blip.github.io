@@ -1,0 +1,43 @@
+/* Movement is on the individual translate property. The interactive objects
+   keep ownership of their own transforms, including the paper stack turns. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  [data-entrance="title"] {
+    --entry-lift: clamp(21px, 3.2vh, 43px);
+    --entry-opacity: .68;
+    --entry-time: 600ms;
+    --entry-lag: 0ms;
+  }
+  [data-entrance="art"] {
+    --entry-lift: clamp(34px, 5.8vh, 78px);
+    --entry-opacity: .60;
+    --entry-time: 820ms;
+    --entry-lag: 45ms;
+  }
+  [data-entrance="note"] {
+    --entry-lift: clamp(18px, 2.6vh, 35px);
+    --entry-opacity: .70;
+    --entry-time: 610ms;
+    --entry-lag: 125ms;
+  }
+  [data-entrance="line"] {
+    --entry-lift: 14px;
+    --entry-opacity: .81;
+    --entry-time: 460ms;
+    --entry-lag: 30ms;
+  }
+  [data-entrance][data-approach="waiting"] {
+    translate: 0 var(--entry-lift);
+    opacity: var(--entry-opacity);
+  }
+  [data-entrance][data-approach="arriving"] {
+    animation: folio-arrival var(--entry-time) cubic-bezier(.19,.74,.23,1) var(--entry-lag) backwards;
+  }
+  @keyframes folio-arrival {
+    from {translate:0 var(--entry-lift);opacity:var(--entry-opacity)}
+    to   {translate:0 0;opacity:1}
+  }
+}
+@media screen and (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  [data-entrance="art"] {--entry-lift:32px;--entry-time:640ms}
+  [data-entrance="note"] {--entry-lag:70ms}
+}

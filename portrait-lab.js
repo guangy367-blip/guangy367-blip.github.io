@@ -20,25 +20,24 @@
   field.className="portrait-field";
   svg.setAttribute("class","portrait-hits");
   svg.setAttribute("viewBox",`0 0 ${width} ${height}`);
-  svg.setAttribute("role","group");
-  svg.setAttribute("aria-label","肖像局部印刷，方向键选择部位，回车变化，Esc 还原");
+  svg.setAttribute("role","button");
+  svg.setAttribute("tabindex","0");
+  svg.setAttribute("aria-label","随机显影肖像局部。回车或空格再试一次，Esc 还原");
   control.className="portrait-tool";
   control.type="button";
   live.className="portrait-live";
   live.setAttribute("aria-live","polite");
   live.setAttribute("aria-atomic","true");
-  const paths=parts.map((part,index)=>{
+  for(const part of parts){
     const path=document.createElementNS(svgNS,"path");
     path.setAttribute("d",part.d);
-    path.setAttribute("role","button");
-    path.setAttribute("aria-label","改变"+part.name+"的局部印刷效果");
-    path.setAttribute("tabindex",index===0?"0":"-1");
+    path.setAttribute("aria-hidden","true");
     const title=document.createElementNS(svgNS,"title");
-    title.textContent="点按"+part.name+"，改变局部印刷";
+    title.textContent="点按肖像，随机显影";
     path.append(title);
     svg.append(path);
-    return path;
-  });
+    part.outline=new Path2D(part.d);
+  }
   field.append(svg,control,live);
   host.append(field);
   host.removeAttribute("aria-hidden");
@@ -50,9 +49,10 @@
   curve.moveTo(625,829);curve.bezierCurveTo(618,799,663,794,662,828);curve.bezierCurveTo(662,847,628,846,625,829);
   curve.moveTo(641,830);curve.quadraticCurveTo(634,848,627,867);
   curve.moveTo(660,828);curve.bezierCurveTo(720,875,759,921,783,980);curve.bezierCurveTo(823,1080,857,1127,928,1125);curve.bezierCurveTo(979,1127,1031,1092,1104,1149);
-  const marks=new Map();
+  const probe=document.createElement("canvas").getContext("2d");
   const motion=matchMedia("(prefers-reduced-motion:reduce)");
-  let chosen=0,last=-1,readable=true,bag=[];
+  let current=null,readable=true,particleFrame=0,expiry=0;
+  const regionDeck={remaining:[],last:-1},effectDeck={remaining:[],last:-1};
   function sizeField(){
     const scale=Math.min(host.clientWidth/width,host.clientHeight/height);
     field.style.width=width*scale+"px";
@@ -63,33 +63,42 @@
   sizeField();
 
   function updateControl(){
-    const modified=marks.size>0;
+    const modified=Boolean(current);
     control.dataset.active=String(modified);
     control.textContent=modified?"还原":"点按肖像";
-    control.setAttribute("aria-label",modified?"还原整幅毕业肖像":"尝试肖像的局部印刷效果");
+    control.setAttribute("aria-label",modified?"还原整幅毕业肖像":"尝试随机肖像显影");
+  }
+  function stopParticles(){
+    cancelAnimationFrame(particleFrame);
+    particleFrame=0;
+    current?.ink?.remove();
+  }
+  function clearMark(){
+    clearTimeout(expiry);
+    stopParticles();
+    current?.surface.remove();
+    current=null;
   }
   function reset(){
-    for(const mark of marks.values())mark.surface.remove();
-    marks.clear();
+    clearMark();
     updateControl();
     live.textContent="已还原原始肖像";
   }
-  function choosePart(index,focus=false){
-    paths[chosen].setAttribute("tabindex","-1");
-    chosen=(index+parts.length)%parts.length;
-    paths[chosen].setAttribute("tabindex","0");
-    if(focus)paths[chosen].focus({preventScroll:true});
+  function drawFrom(deck,count){
+    if(!deck.remaining.length)deck.remaining=Array.from({length:count},(_,i)=>i);
+    const choices=deck.remaining.filter(value=>value!==deck.last);
+    const next=choices[Math.floor(Math.random()*choices.length)];
+    deck.remaining.splice(deck.remaining.indexOf(next),1);
+    deck.last=next;
+    return next;
   }
-  function nextEffect(index){
-    if(!bag.length)bag=[0,1,2,3];
-    const avoid=marks.get(index)?.effect;
-    let choices=bag.filter(value=>value!==last&&value!==avoid);
-    if(!choices.length)choices=[0,1,2,3].filter(value=>value!==last&&value!==avoid);
-    const effect=choices[Math.floor(Math.random()*choices.length)];
-    bag=bag.filter(value=>value!==effect);
-    if(bag.length===1&&bag[0]===last)bag=[];
-    last=effect;
-    return effect;
+  function sampleCentre(part){
+    for(let i=0;i<16;i++){
+      const x=part.cx+(Math.random()-.5)*part.r*.72;
+      const y=part.cy+(Math.random()-.5)*part.r*.7;
+      if(probe.isPointInPath(part.outline,x,y))return {x,y};
+    }
+    return {x:part.cx,y:part.cy};
   }
   function buffer(w,h){
     const el=document.createElement("canvas");
@@ -143,9 +152,71 @@
     }
     ctx.putImageData(result,0,0);
   }
-  function apply(index,x,y){
+  function scatter(mark,part,tones,left,top){
+    const {surface,effect}=mark,side=surface.width,r=side/2;
+    const ink=buffer(side,side),ctx=ink.getContext("2d");
+    if(!ctx)return;
+    ink.className="portrait-ink";
+    ink.setAttribute("aria-hidden","true");
+    ink.style.cssText=surface.style.cssText;
+    field.insertBefore(ink,svg);
+    mark.ink=ink;
+    const palettes=[
+      ["#e6d0ab","#d6a36d","#91aba4","#efdcbb"],
+      ["#f6d49b","#dc765e","#78aca8","#ead7b9"],
+      ["#e0d4b1","#b6b098","#eee1c7","#8a9a89"],
+      ["#f4d4a5","#e4b88e","#c7cfbc","#fff0d3"]
+    ];
+    const grains=[];
+    const count=Math.round(36+side*.24);
+    const displayScale=Math.max(.12,field.clientWidth/width);
+    const smallest=Math.max(side*.009,1.25/displayScale);
+    for(let attempt=0;grains.length<count&&attempt<count*13;attempt++){
+      const x=Math.random()*side,y=Math.random()*side,dx=x-r,dy=y-r;
+      if(Math.hypot(dx,dy)>r*.88||!probe.isPointInPath(part.outline,x+left,y+top))continue;
+      const i=(Math.floor(y)*side+Math.floor(x))*4;
+      if(tones&&(tones[i+3]<195||tones[i]-tones[i+1]>9))continue;
+      const phase=Math.atan2(dy,dx),kick=r*(.16+Math.random()*.47);
+      grains.push({x,y,dx:Math.cos(phase)*kick,dy:Math.sin(phase)*kick,
+        curve:(Math.random()-.45)*r*.42,lag:Math.random()*.17,
+        size:smallest+Math.random()*(side*.008+1.1/displayScale),
+        shade:palettes[effect][Math.floor(Math.random()*4)]});
+    }
+    const start=performance.now();
+    function draw(now){
+      if(current!==mark)return;
+      const t=Math.min(1,(now-start)/1050);
+      ctx.clearRect(0,0,side,side);
+      for(const grain of grains){
+        const u=Math.min(1,Math.max(0,(t-grain.lag)/(1-grain.lag)));
+        if(!u||u>=1)continue;
+        const sweep=Math.sin(Math.PI*u),bend=Math.sin(2*Math.PI*u);
+        const x=grain.x+grain.dx*sweep-grain.curve*bend;
+        const y=grain.y+grain.dy*sweep-grain.curve*sweep*.42;
+        const size=grain.size*(.64+.48*sweep);
+        ctx.fillStyle=grain.shade;
+        ctx.globalAlpha=Math.min(1,u*8,(1-u)*4)*.91;
+        if(effect===0)ctx.fillRect(x-size/2,y-size/2,size*1.3,size*.85);
+        else{
+          ctx.beginPath();
+          ctx.ellipse(x,y,size*(effect===2?1.05:.62),size*(effect===2?.37:.62),effect===2?-.56:0,0,Math.PI*2);
+          ctx.fill();
+        }
+      }
+      // The moving grains use the same exact silhouette and thread cutout as the settled ink.
+      ctx.globalAlpha=1;
+      ctx.globalCompositeOperation="destination-in";
+      ctx.drawImage(surface,0,0);
+      ctx.globalCompositeOperation="source-over";
+      if(t<1)particleFrame=requestAnimationFrame(draw);
+      else stopParticles();
+    }
+    particleFrame=requestAnimationFrame(draw);
+  }
+  function apply(){
     if(!photo.complete||!photo.naturalWidth)return;
-    const part=parts[index],effect=nextEffect(index),side=part.r*2;
+    const index=drawFrom(regionDeck,parts.length),effect=drawFrom(effectDeck,treatments.length);
+    const part=parts[index],side=part.r*2,{x,y}=sampleCentre(part);
     const left=Math.round(x-part.r),top=Math.round(y-part.r);
     const surface=buffer(side,side),raw=buffer(side,side);
     const ctx=surface.getContext("2d"),source=raw.getContext("2d",{willReadFrequently:true});
@@ -171,45 +242,49 @@
     mask.addColorStop(0,"#000");mask.addColorStop(.5,"rgba(0,0,0,.93)");mask.addColorStop(1,"transparent");
     ctx.fillStyle=mask;ctx.fillRect(0,0,side,side);
     const trim=buffer(side,side),cut=trim.getContext("2d");
-    cut.translate(-left,-top);cut.fill(new Path2D(part.d));
+    cut.translate(-left,-top);cut.fill(part.outline);
     ctx.drawImage(trim,0,0);
     ctx.globalCompositeOperation="destination-out";ctx.translate(-left,-top);
     ctx.lineWidth=18;ctx.lineCap="round";ctx.lineJoin="round";ctx.stroke(curve);
     if(samples){
       // Also preserve fine red fringe pixels outside the hand-traced thread.
-      for(let i=0;i<tones.length;i+=4)tones[i+3]=tones[i]-tones[i+1]>7&&tones[i]-tones[i+2]>9?255:0;
-      cut.putImageData(samples,0,0);
+      const red=cut.createImageData(side,side);
+      for(let i=0;i<tones.length;i+=4)red.data[i+3]=tones[i]-tones[i+1]>7&&tones[i]-tones[i+2]>9?255:0;
+      cut.putImageData(red,0,0);
       ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(trim,0,0);
     }
     surface.className="portrait-stamp";
     surface.setAttribute("aria-hidden","true");
     Object.assign(surface.style,{left:left/width*100+"%",top:top/height*100+"%",width:side/width*100+"%",height:side/height*100+"%"});
-    marks.get(index)?.surface.remove();
+    clearMark();
     field.insertBefore(surface,svg);
-    marks.set(index,{surface,effect});
-    if(!motion.matches&&surface.animate)surface.animate([{opacity:0},{opacity:1}],{duration:210,easing:"ease-out"});
+    const mark={surface,effect,ink:null};
+    current=mark;
+    if(!motion.matches&&surface.animate){
+      surface.animate([{opacity:0},{opacity:.22,offset:.3},{opacity:1}],{duration:910,easing:"ease-out"});
+      scatter(mark,part,tones,left,top);
+    }
+    expiry=setTimeout(()=>{
+      if(current!==mark)return;
+      if(motion.matches||!surface.animate){reset();return}
+      const fade=surface.animate([{opacity:1},{opacity:0}],{duration:430,fill:"forwards"});
+      fade.onfinish=()=>{if(current===mark)reset()};
+    },4800);
     updateControl();
     live.textContent=part.name+" · "+treatments[effect];
   }
-  paths.forEach((path,index)=>{
-    path.addEventListener("click",event=>{
-      choosePart(index);
-      const point=new DOMPoint(event.clientX,event.clientY).matrixTransform(svg.getScreenCTM().inverse());
-      const {cx,cy}=parts[index];
-      apply(index,event.detail?point.x:cx,event.detail?point.y:cy);
-    });
-    path.addEventListener("keydown",event=>{
-      if(event.altKey||event.ctrlKey||event.metaKey)return;
-      if(["ArrowLeft","ArrowUp","ArrowRight","ArrowDown","Home","End"].includes(event.key)){
-        event.preventDefault();
-        const target=event.key==="Home"?0:event.key==="End"?parts.length-1:index+(["ArrowRight","ArrowDown"].includes(event.key)?1:-1);
-        choosePart(target,true);
-      }else if(event.key===" "||event.key==="Enter"){
-        event.preventDefault();apply(index,parts[index].cx,parts[index].cy);
-      }
-    });
+  svg.addEventListener("click",apply);
+  svg.addEventListener("keydown",event=>{
+    if(event.altKey||event.ctrlKey||event.metaKey)return;
+    if(event.key===" "||event.key==="Enter"){
+      event.preventDefault();
+      if(!event.repeat)apply();
+    }
   });
-  field.addEventListener("keydown",event=>{if(event.key==="Escape"&&marks.size){event.preventDefault();reset()}});
-  control.addEventListener("click",()=>{if(marks.size)reset();else apply(chosen,parts[chosen].cx,parts[chosen].cy)});
+  field.addEventListener("keydown",event=>{if(event.key==="Escape"&&current){event.preventDefault();reset()}});
+  control.addEventListener("click",()=>{if(current)reset();else apply()});
+  document.addEventListener("visibilitychange",()=>{if(document.hidden&&current)reset()});
+  window.addEventListener("film-progress",()=>{if(current&&host.closest("[inert]"))reset()});
+  motion.addEventListener("change",()=>{if(current)reset()});
   updateControl();
 })();

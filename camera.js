@@ -5,6 +5,7 @@
   const acts = [...stage.querySelectorAll("[data-shot]")];
   const controls = [...stage.querySelectorAll("[data-lens]")];
   const branch = stage.querySelector(".cover-track"), heading = stage.querySelector(".cover-heading");
+  const entry = stage.querySelector(".cover-entry");
   const cord = stage.querySelector(".film-lanyard"), portrait = stage.querySelector(".portrait-composition");
   const resume = [...stage.querySelectorAll(".cv-kicker,.cv-social,.cv-nameplate,.cv-column")];
   const method = stage.querySelector(".thread-writing"), knot = stage.querySelector(".thread-art");
@@ -14,9 +15,10 @@
   const reduced = matchMedia("(prefers-reduced-motion:reduce)");
   const phone = matchMedia("(max-width:860px) and (orientation:portrait)");
   const stops = [0,.51,.95];
+  const threadStart=.785, threadEnd=.984;
   const clamp = v => Math.max(0,Math.min(1,v));
   const step = (t,a,b) => {const x=clamp((t-a)/(b-a)); return x*x*(3-2*x)};
-  let origin=0,travel=1,height=1,position=0,target=0,frame=0,prevTime=0,active=-1;
+  let origin=0,travel=1,height=1,position=0,target=0,exit=0,frame=0,prevTime=0,active=-1;
   function layer(node,alpha,pose) {
     node.style.opacity=alpha.toFixed(4);
     if (alpha>0) node.style.transform=pose;
@@ -42,7 +44,7 @@
     const branchAlpha=1-step(q,.218,.342);
     const faceIn=step(q,.229,.457), faceOut=step(q,.566,.755);
     const portraitAlpha=step(q,.244,.407)*(1-step(q,.60,.746));
-    const knotAlpha=step(q,phone.matches ? .657 : .627,.815);
+    const knotAlpha=step(q,phone.matches ? .639 : .625,.778);
     acts[0].style.visibility=q<.434?"visible":"hidden";
     acts[1].style.visibility=q>.16&&q<.884?"visible":"hidden";
     acts[2].style.visibility=q>.595?"visible":"hidden";
@@ -51,6 +53,7 @@
     // the physical objects move at a different depth, already present at a cut.
     if(q<.434) {
       layer(heading,1-step(q,.085,.241),move(-7*intoCV,-14*intoCV));
+      layer(entry,1-step(q,.065,.215),move(-3*intoCV,-8*intoCV));
       layer(branch,branchAlpha,move(-9*branchPass,-48*branchPass,1+.48*branchPass,-12*branchPass));
     }
     const lift=step(q,.037,.285);
@@ -66,21 +69,26 @@
       });
     }
     if(q>.595) {
-      const threadIn=step(q,.635,.888);
-      const pen=step(q,.683,.815);
+      const threadIn=step(q,.635,.793);
+      const pen=step(q,.673,.779);
       const travelling=threadIn<1 && !reduced.matches;
       knot.classList.toggle("thread-arriving",travelling);
       if(travelling) knot.style.setProperty("--thread-edge",((1-threadIn)*100).toFixed(2)+"%");
-      layer(knot,knotAlpha,move(0,3*(1-intoMethod),1+.025*(1-intoMethod)));
-      layer(method,pen,move(0,3*(1-pen)));
+      const handoff=reduced.matches?0:step(exit,.025,.88);
+      layer(knot,knotAlpha*(1-.88*handoff),move(0,3*(1-intoMethod)-handoff*5,1+.025*(1-intoMethod)));
+      layer(method,pen*(1-handoff),move(0,3*(1-pen)-handoff*8));
+      stage.style.setProperty("--thread-exit",handoff.toFixed(3));
       stitches.forEach((station,i)=>{
-        const t=step(q,.69+i*.047,.79+i*.054);
+        const t=step(q,.674+i*.019,.742+i*.019);
         layer(station,t,move(0,2*(1-t)));
       });
     }
     gauge.style.transform="scaleX("+(.065+.935*p).toFixed(3)+")";
     stage.dataset.knotVisible=String(knotAlpha>0);
-    window.dispatchEvent(new CustomEvent("film-progress",{detail:{progress:p,knotReveal:knotAlpha}}));
+    window.dispatchEvent(new CustomEvent("film-progress",{detail:{
+      progress:p,knotReveal:knotAlpha,threadPosition:clamp((p-threadStart)/(threadEnd-threadStart)),
+      threadReading:index===2&&p>=threadStart-.006&&exit<.44
+    }}));
   }
   function animate(time) {
     frame=0;
@@ -95,9 +103,12 @@
   }
   function readScroll(snap=false) {
     const next=clamp((window.scrollY-origin)/travel);
-    if(!snap&&next===target)return;
+    const departure=clamp((window.scrollY-origin-travel)/height);
+    if(!snap&&next===target&&departure===exit)return;
+    const followingEdge=next===1&&departure!==exit;
+    exit=departure;
     target=next;
-    if(snap||window.scrollY>=origin+travel+height||reduced.matches){
+    if(snap||followingEdge||window.scrollY>=origin+travel+height||reduced.matches){
       cancelAnimationFrame(frame);frame=0;prevTime=0;position=target;render(position);return;
     }
     if(!frame)frame=requestAnimationFrame(animate);
@@ -107,7 +118,10 @@
     height=stage.offsetHeight;travel=Math.max(1,reel.offsetHeight-height);
     readScroll(true);
   }
-  function jump(i){window.scrollTo({top:origin+stops[i]*travel,behavior:reduced.matches?"instant":"smooth"})}
+  function jump(i){
+    if(i===2)window.dispatchEvent(new Event("thread-restart"));
+    window.scrollTo({top:origin+(i===2?threadStart+.004:stops[i])*travel,behavior:reduced.matches?"instant":"smooth"});
+  }
   controls.forEach((control,i)=>{
     control.addEventListener("click",()=>jump(i));
     control.addEventListener("keydown",e=>{
@@ -120,11 +134,12 @@
     if(active===2||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
     e.preventDefault();jump(active+1);
   });
-  reel.classList.add("film-ready");
+  reel.classList.add("film-ready","thread-runway");
   measure();
   new ResizeObserver(measure).observe(reel);
   window.addEventListener("scroll",()=>readScroll(),{passive:true});
   window.addEventListener("resize",measure,{passive:true});
   window.addEventListener("pageshow",measure);
+  window.addEventListener("film-refresh",()=>readScroll(true));
   reduced.addEventListener("change",measure);
 })();

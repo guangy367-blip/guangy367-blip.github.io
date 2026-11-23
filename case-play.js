@@ -1,14 +1,14 @@
 (() => {
   "use strict";
   const works = {
-    monkey: ["猴山", "磁吸猴山", "magnetic landscape", 11],
-    cabinet: ["开柜抓现行", "拉开抽屉", "inside the drawer", 11],
-    beasts: ["怪兽很灵", "给瑞兽配个心愿", "a wish for your desk", 13],
-    dufu: ["杜甫的屋顶又飞了", "抽纸起风", "a poem in the wind", 7]
+    monkey: ["猴山", "磁吸猴山", 11],
+    cabinet: ["开柜抓现行", "拉开抽屉", 11],
+    beasts: ["怪兽很灵", "给瑞兽配个心愿", 13],
+    dufu: ["杜甫的屋顶又飞了", "抽纸起风", 7]
   };
   const query = new URLSearchParams(location.search);
   const key = Object.hasOwn(works, query.get("p")) ? query.get("p") : "monkey";
-  const [title, activity, english, count] = works[key];
+  const [title, activity, count] = works[key];
   const chapter = Math.max(1, Math.min(count, parseInt(query.get("from"), 10) || 1));
   const reader = "case.html?p=" + key + (chapter > 1 ? "#chapter-" + chapter : "");
   const byId = id => document.getElementById(id);
@@ -18,7 +18,8 @@
   const root = byId("interactive");
   byId("return").href = reader;
   byId("activity").textContent = activity;
-  byId("work-caption").textContent = title + " / " + english;
+  byId("work-caption").textContent = title;
+  document.body.dataset.work = key;
   document.title = activity + " · " + title + " | 何星霆";
   const announce = content => { byId("feedback").textContent = content; };
   const frame = (stage, controls) =>
@@ -156,4 +157,33 @@
   } else if(key==="cabinet") cabinet();
   else if(key==="beasts") beasts();
   else dufu();
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const panel = root.querySelector(".controls, .mp-bench");
+    if (!panel) return;
+    const heading = panel.querySelector("h2, .mp-bench-top");
+    const head = document.createElement("div");
+    const body = document.createElement("div");
+    const toggle = document.createElement("button");
+    head.className = "panel-head";
+    body.className = "control-scroll";
+    body.id = "hands-on-controls";
+    toggle.type = "button";
+    toggle.className = "panel-toggle";
+    toggle.setAttribute("aria-controls",body.id);
+    head.append(heading,toggle);
+    while(panel.firstChild) body.append(panel.firstChild);
+    panel.append(head,body);
+    const compact = matchMedia("(max-width: 1024px) and (orientation: portrait)");
+    function setFolded(folded) {
+      toggle.hidden = !compact.matches;
+      toggle.setAttribute("aria-expanded", String(!folded));
+      toggle.textContent = folded ? "展开操作" : "收起操作";
+      body.hidden = folded;
+      panel.classList.toggle("folded", folded);
+    }
+    toggle.addEventListener("click",()=>setFolded(!body.hidden));
+    compact.addEventListener("change",()=>setFolded(false));
+    setFolded(false);
+  }, {once:true});
 })();

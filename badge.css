@@ -54,12 +54,13 @@
 
 /* Size the actual print, independently of the ribbon's drawing surface. */
 #top.folio-cover #badge-rig{
-  --badge-w:min(24vw,38svh,430px);
+  --badge-w:min(16vw,28svh,330px);
+  --rig-width:calc(var(--badge-w) * 1.7);
   --badge-h:calc(var(--badge-w) * 1.33);
   --hole-y:clamp(11px,.99vw,21px);
   --eye-w:clamp(20px,1.9vw,39px);
-  position:absolute;inset:0 3.6% auto auto;width:34%;
-  height:85svh;z-index:4;pointer-events:none
+  position:absolute;inset:0 auto auto calc(var(--branch-start) + var(--branch-span) * .806 - var(--rig-width) * .5);width:var(--rig-width);
+  height:68svh;z-index:4;pointer-events:none
 }
 #badge-rig .badge-body,#badge-rig .badge-control{pointer-events:auto}
 #badge-rig .badge-body{top:calc(0px - var(--hole-y));transform-origin:50% var(--hole-y)}
@@ -84,15 +85,13 @@
 #badge-rig .badge-clients li{font-size:clamp(11px,calc(var(--badge-w) * .052),21px);line-height:1.45}
 #badge-rig .badge-control{transition:opacity .19s;max-width:100%}
 #badge-rig:has(.is-grabbed) .badge-control{opacity:0;pointer-events:none}
-@media(max-width:760px) and (orientation:portrait){
-  #top.folio-cover #badge-rig{--badge-w:clamp(144px,42vw,242px);inset:0 5.5% auto auto;width:52%;height:clamp(330px,49svh,510px)}
+@media(max-width:860px) and (orientation:portrait){
+  #top.folio-cover #badge-rig{--badge-w:min(30vw,17.5svh,174px);inset:0 4% auto auto;width:42%;height:48svh}
 }
 @media(max-height:480px) and (orientation:landscape){
-  #top.folio-cover #badge-rig{--badge-w:min(24vw,39svh);inset:0 4% auto auto;width:29%;height:83svh}
+  #top.folio-cover #badge-rig{--badge-w:min(15vw,27svh);height:68svh}
 }
-@media(max-width:760px) and (orientation:portrait) and (max-height:630px){
-  #top.folio-cover #badge-rig{--badge-w:clamp(118px,22svh,140px);height:48svh}
-}
+
 @media(max-width:400px), (max-height:480px) and (orientation:landscape){
   #badge-rig .badge-back{padding:17px 9px 8px}
   #badge-rig .badge-back-heading{margin:5px 0 4px}
@@ -100,3 +99,13 @@
   #badge-rig .badge-clients li{line-height:1.23;padding:2px 0}
 }
 @media(prefers-reduced-motion:reduce){#badge-rig .badge-control{transition:none}}
+
+#top .badge-face{-webkit-text-size-adjust:none;text-size-adjust:none}
+@media(max-width:860px) and (orientation:portrait),(max-height:480px) and (orientation:landscape){
+  #badge-rig .badge-rule,#badge-rig .badge-rule time,#badge-rig .badge-name small,#badge-rig .badge-school{font-size:calc(var(--badge-w) * .051)}
+  #badge-rig .badge-back{padding:calc(var(--badge-w)*.14) calc(var(--badge-w)*.065) calc(var(--badge-w)*.055)}
+  #badge-rig .badge-clients{grid-template-rows:repeat(5,minmax(0,1fr))}
+  #badge-rig .badge-clients li{font-size:calc(var(--badge-w) * .06);padding:0;line-height:1.16}
+  #badge-rig .badge-back-heading small{font-size:calc(var(--badge-w)*.048)}
+  #badge-rig .badge-control{padding:4px 7px;min-height:26px;border:0;background:#11110f;color:#dedad0;font-size:11px;line-height:1.2}
+}

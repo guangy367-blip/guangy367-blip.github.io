@@ -1,13 +1,14 @@
 .portrait-field{
  position:absolute;left:50%;bottom:0;transform:translateX(-50%);pointer-events:none;isolation:isolate
 }
-.portrait-hits,.portrait-stamp{position:absolute;display:block;pointer-events:none}
-.portrait-hits{inset:0;width:100%;height:100%;overflow:visible;z-index:1}
+.portrait-hits,.portrait-stamp,.portrait-ink{position:absolute;display:block;pointer-events:none}
+.portrait-hits{inset:0;width:100%;height:100%;overflow:visible;z-index:1;outline:none;-webkit-tap-highlight-color:transparent}
 .portrait-hits path{
  fill:transparent;stroke:none;pointer-events:visibleFill;cursor:crosshair;
  touch-action:pan-y pinch-zoom;-webkit-tap-highlight-color:transparent;outline:none
 }
-.portrait-hits path:focus-visible{
+.portrait-hits:focus{outline:none}
+.portrait-hits:focus-visible path{
  stroke:#d8b492;stroke-width:1.25;stroke-dasharray:4 5;vector-effect:non-scaling-stroke
 }
 .portrait-tool{
@@ -30,5 +31,5 @@
  .portrait-tool{left:68%;top:29%;min-height:31px;gap:4px;font-size:10px;letter-spacing:0}
  .portrait-tool::before{width:11px;height:11px}
 }
-@media(prefers-reduced-motion:reduce){.portrait-tool::before{transition:none}}
+@media(prefers-reduced-motion:reduce){.portrait-tool::before{transition:none}.portrait-ink{display:none}}
 @media print{.portrait-field{display:none}}

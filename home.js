@@ -1,5 +1,19 @@
 (() => {
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  const menu = document.querySelector(".cover-menu-button");
+  const links = document.querySelector("#cover-links");
+  const compact = matchMedia("(max-width:860px)");
+  function closeMenu(focus = false) {
+    if(menu.getAttribute("aria-expanded") !== "true") return;
+    menu.setAttribute("aria-expanded","false");
+    if(focus) menu.focus({preventScroll:true});
+  }
+  menu.addEventListener("click",()=>menu.setAttribute("aria-expanded",String(menu.getAttribute("aria-expanded")!=="true")));
+  links.addEventListener("click",event=>{if(event.target.closest("a,button"))closeMenu()});
+  document.addEventListener("pointerdown",event=>{if(!menu.contains(event.target)&&!links.contains(event.target))closeMenu()});
+  document.addEventListener("focusin",event=>{if(!menu.contains(event.target)&&!links.contains(event.target))closeMenu()});
+  document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMenu(true)});
+  compact.addEventListener("change",()=>closeMenu());
   const modes = [...document.querySelectorAll("[data-view]")];
   modes.forEach(button => button.addEventListener("click",() => {
     if (button.closest(".view-switch")?.hasAttribute("data-proof-ready")) return;
@@ -7,10 +21,16 @@
     modes.forEach(el => el.setAttribute("aria-pressed",String(el === button)));
   }));
   const box=document.querySelector("#contact"), status=document.querySelector("#copy-status");
+  let contactOpener;
   document.querySelectorAll("[data-contact]").forEach(b=>b.addEventListener("click",()=>{
+    contactOpener=b;
     status.textContent="";box.showModal();document.body.style.overflow="hidden";
   }));
-  box.addEventListener("close",()=>document.body.style.overflow="");
+  box.addEventListener("close",()=>{
+    document.body.style.overflow="";
+    if(compact.matches && links.contains(contactOpener))menu.focus({preventScroll:true});
+    contactOpener=null;
+  });
   box.addEventListener("click",e=>{if(e.target===box)box.close();});
   document.querySelector("#dismiss").addEventListener("click",()=>box.close());
   const sealButton=box.querySelector(".calling-seal");
