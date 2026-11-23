@@ -10,7 +10,7 @@
   ];
   const img=(file,alt,cls="")=>`<img class="${cls}" data-file="media/commission-${file}.webp" alt="${alt}" decoding="async" draggable="false">`;
   const willow=`<div class="cm-art cm-willow"><i class="cm-ring" aria-hidden="true"></i><span class="cm-glyphs" aria-hidden="true">柳　燕</span>
-    <div class="cm-pair">${img("willow-boy","杨柳男孩，柳枝发饰与淡绿长袍")}${img("willow-girl","燕妮的跃起姿态与绕身飘带")}</div>
+    <div class="cm-pair"><button type="button" class="cm-character" aria-label="认识杨柳">${img("willow-boy","杨柳男孩，柳枝发饰与淡绿长袍")}</button><button type="button" class="cm-character" aria-label="认识燕妮">${img("willow-girl","燕妮的跃起姿态与绕身飘带")}</button></div>
     <span class="cm-colophon">校园角色原稿</span></div>`;
   const porcelain=`<div class="cm-art cm-porcelain"><div class="cm-prints">${[["han","汉"],["song","宋"],["ming","明"]].map(([k,n])=>`<figure>${img(k,"冠灵·"+n+"，玉漱角色设计原稿")}</figure>`).join("")}</div><span class="cm-colophon">冠灵系列 · 汉 / 宋 / 明</span></div>`;
   const pairs = [
@@ -38,15 +38,62 @@
     const stage=host.querySelector(".cm-squeeze");
     const buttons=[...stage.querySelectorAll("[data-pair]")];
     const pictures=stage.querySelectorAll("img");
-    buttons.forEach((btn,i)=>btn.addEventListener("click",()=>{
+    let request=0;
+    buttons.forEach((btn,i)=>btn.addEventListener("click",async()=>{
+      const version=++request;
       if(btn.getAttribute("aria-pressed")==="true")return;
-      pairs[i].forEach(([file,name],index)=>{
-        pictures[index].alt="生肖"+name+"捏捏乐正面";
-        pictures[index].src="media/commission-zodiac-"+file+".webp";
+      const next=pairs[i].map(([file])=>{const im=new Image();im.src="media/commission-zodiac-"+file+".webp";return im;});
+      try{await Promise.all(next.map(im=>im.decode()))}catch{if(version===request)stage.closest(".cm-panel").querySelector(".cm-response").textContent="这对生肖尚未载入，可再点一次。";return;}
+      if(version!==request)return;
+      pairs[i].forEach(([,name],index)=>{
+        pictures[index].alt="生肖"+name+"捏捏乐正面";pictures[index].src=next[index].src;
         pictures[index].removeAttribute("data-file");
+        pictures[index].closest(".cm-artwork").classList.remove("cm-imprint");
+        pictures[index].closest(".cm-artwork").querySelector(".cm-activate").setAttribute("aria-label","轻捏生肖"+name);
       });
       buttons.forEach((other,index)=>other.setAttribute("aria-pressed",String(index===i)));
+      stage.closest(".cm-panel").querySelector(".cm-response").textContent="轻捏"+pairs[i].map(p=>p[1]).join("或")+"，看看手感。";
     }));
+  }
+  const cues=["点选柳、燕，看角色设定。","点海豹，让它跃入泳道。","点选一张冠饰原稿。","轻捏生肖，松手回弹。","点九尾狐，切换炉光。"];
+  function wireArt(panel,reduced) {
+    const art=panel.querySelector(".cm-art"),response=panel.querySelector(".cm-response"),theme=panel.dataset.theme;
+    const frames=(node,keys,options)=>{if(!reduced.matches&&node.animate){node.getAnimations().forEach(a=>a.cancel());node.animate(keys,options)}};
+    const sheets=Array.from(art.querySelectorAll(theme==="willow"?".cm-character":theme==="porcelain"?".cm-prints figure":".cm-artwork"));
+    sheets.forEach((sheet,i)=>{
+      const im=sheet.querySelector("img");
+      const btn=theme==="willow"?sheet:document.createElement("button");
+      if(btn!==sheet){
+        btn.type="button";btn.className="cm-activate";
+        const label=theme==="pool"?["湖蓝海豹起跳","玫粉海豹起跳"][i]:theme==="porcelain"?"查看"+["汉","宋","明"][i]+"代冠灵原稿":theme==="squeeze"?"轻捏生肖"+pairs[0][i][1]:"切换九尾狐炉光";
+        btn.setAttribute("aria-label",label);sheet.append(btn);
+      }
+      if(theme==="hearth"||theme==="porcelain"||theme==="willow")btn.setAttribute("aria-pressed","false");
+      btn.addEventListener("click",()=>{
+        const options={duration:540,easing:"cubic-bezier(.24,.69,.23,1)"};
+        if(theme==="willow"||theme==="porcelain"){
+          sheets.forEach((s,j)=>{s.classList.toggle("cm-current",i===j);(s.matches("button")?s:s.querySelector(".cm-activate")).setAttribute("aria-pressed",String(i===j))});
+          const text=theme==="willow"?["杨柳 · 柳枝发饰与淡绿长袍","燕妮 · 飞燕与飘带"][i]:"冠灵系列 · "+["汉","宋","明"][i];
+          art.querySelector(".cm-colophon").textContent=text;response.textContent=text;
+          if(theme==="willow")frames(im,[{transform:"translateY(0) rotate(0)"},{transform:i?"translateY(-12px) rotate(4deg)":"translateY(-7px) rotate(-4deg)",offset:.36},{transform:"none"}],options);
+          return;
+        }
+        if(theme==="pool"){
+          sheets.forEach(s=>s.classList.toggle("cm-imprint",s===sheet));
+          frames(im,[{transform:"none"},{transform:"translateY(3%) rotate(-4deg)",offset:.16},{transform:"translate(3%,-12%) rotate(6deg)",offset:.52},{transform:"none"}],{...options,duration:700});
+          const lane=sheet.querySelector(".cm-lane");frames(lane,[{backgroundPositionX:"0px"},{backgroundPositionX:"32px"}],{duration:710,easing:"ease-out"});
+          const water=sheet.querySelector(".cm-water");frames(water,[{translate:"0 0"},{translate:"-1% 6%",offset:.3},{translate:"1% -5%",offset:.64},{translate:"0 0"}],options);
+          response.textContent=(i?"玫粉":"湖蓝")+"海豹 · 越过泳道线";
+        }else if(theme==="squeeze"){
+          sheets.forEach(s=>s.classList.toggle("cm-imprint",s===sheet));
+          frames(im,[{transform:"translateY(0) scaleY(1)"},{transform:"translateY(1.5%) scaleY(.77)",offset:.28},{transform:"translateY(-2%) scaleY(1)",offset:.58},{transform:"translateY(0) scaleY(.94)",offset:.77},{transform:"none"}],{...options,duration:550});
+          response.textContent=im.alt.replace("正面","")+" · 回弹";
+        }else{
+          const lit=art.classList.toggle("cm-firelit");btn.setAttribute("aria-pressed",String(lit));
+          response.textContent=lit?"炉边 · 暖光":"炉边 · 天光";
+        }
+      });
+    });
   }
   function mount() {
     let host=document.getElementById("journey");
@@ -60,24 +107,28 @@
       <div class="cm-panels">${projects.map((p,i)=>`<section id="cm-panel-${i}" data-theme="${p.theme}" class="cm-panel" tabindex="0" role="tabpanel" aria-labelledby="${tabIds[i]}" hidden><div class="cm-copy">
         <p class="cm-meta"><time datetime="${p.year.replace(".","-")}">${p.year}</time><span>${p.category}</span></p><h3>${p.title}</h3>
         <p class="cm-client">${p.client}</p><p class="cm-description">${p.description}</p>
-        <dl><dt>交付内容</dt><dd>${p.output}</dd></dl></div>${art[i]}</section>`).join("")}</div></div>`;
+        <dl><dt>交付内容</dt><dd>${p.output}</dd></dl><p class="cm-response" role="status" aria-live="polite">${cues[i]}</p></div>${art[i]}</section>`).join("")}</div></div>`;
     const buttons=[...host.querySelectorAll('[role="tab"]')],panels=[...host.querySelectorAll('[role="tabpanel"]')];
     wirePairs(host);
     const reduced=matchMedia("(prefers-reduced-motion:reduce)");
+    panels.forEach(panel=>wireArt(panel,reduced));
     let active=-1,visible=false;
     const load=i=>{
       panels[i].querySelectorAll("img[data-file]").forEach(im=>{im.src=im.dataset.file;im.removeAttribute("data-file")});
     };
     function show(index,focus=false) {
       if (active===index)return;
+      const direction=active<0||index>active?1:-1;
       active=index;
       if(visible)load(index);
       buttons.forEach((btn,i)=>{btn.setAttribute("aria-selected",String(i===index));btn.tabIndex=i===index?0:-1;panels[i].hidden=i!==index});
       if(focus)buttons[index].focus({preventScroll:true});
       if(!reduced.matches){
         const surface=panels[index].querySelector(".cm-art");
-        surface.animate?.([{opacity:.65,transform:"perspective(1400px) rotateY(-3deg) translateX(9px)"},{opacity:1,transform:"none"}],{duration:400,easing:"cubic-bezier(.16,.8,.2,1)"});
-        panels[index].querySelector(".cm-copy").animate?.([{opacity:.35,transform:"translateY(5px)"},{opacity:1,transform:"none"}],{duration:300});
+        surface.getAnimations().forEach(a=>a.cancel());
+        surface.animate?.([{opacity:.22,transform:"translateX("+direction*18+"px)"},{opacity:1,transform:"none"}],{duration:360,easing:"cubic-bezier(.2,.8,.18,1)"});
+        const copy=panels[index].querySelector(".cm-copy");copy.getAnimations().forEach(a=>a.cancel());
+        copy.animate?.([{opacity:.22,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:330,easing:"ease-out"});
       }
     }
     buttons.forEach((btn,i)=>{
@@ -89,7 +140,12 @@
       });
     });
     // Swipe through the paper samples while leaving vertical page gestures native.
-    let start;
+    let start,swipedAt=-1000;
+    host.addEventListener("click",e=>{
+      if(e.detail && performance.now()-swipedAt<250 && e.target.closest(".cm-art")){
+        e.preventDefault();e.stopPropagation();
+      }
+    },true);
     host.querySelector(".cm-panels").addEventListener("pointerdown",e=>{
       if(e.pointerType==="touch"&&e.target.closest(".cm-art")&&!e.target.closest(".cm-pager"))start=[e.pointerId,e.clientX,e.clientY];
     });
@@ -97,7 +153,7 @@
       if(!start||start[0]!==e.pointerId)return;
       const dx=e.clientX-start[1],dy=e.clientY-start[2];start=null;
       if(Math.abs(dx)>52&&Math.abs(dx)>Math.abs(dy)*1.5){
-
+        swipedAt=performance.now();
         show((active+(dx<0?1:buttons.length-1))%buttons.length);
       }
     });

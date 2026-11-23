@@ -2,6 +2,7 @@
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
   const modes = [...document.querySelectorAll("[data-view]")];
   modes.forEach(button => button.addEventListener("click",() => {
+    if (button.closest(".view-switch")?.hasAttribute("data-proof-ready")) return;
     document.querySelector("#cards").classList.toggle("list",button.dataset.view === "list");
     modes.forEach(el => el.setAttribute("aria-pressed",String(el === button)));
   }));
@@ -44,6 +45,9 @@
   if("IntersectionObserver" in window && !motion.matches){
     const observer=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{if(!entry.isIntersecting)return;
+        if(entry.target.matches(".card") && entry.target.closest("#works")?.hasAttribute("data-index-view")){
+          observer.unobserve(entry.target);return;
+        }
         entry.target.animate([{transform:"translateY(16px)",opacity:.58},{transform:"none",opacity:1}],{duration:480,easing:"cubic-bezier(.2,.75,.2,1)"});
         observer.unobserve(entry.target);
       });

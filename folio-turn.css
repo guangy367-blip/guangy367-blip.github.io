@@ -1,0 +1,11 @@
+/* A short sheet transition connects the index to the continuous artwork reader. */
+@view-transition{navigation:auto}
+@media(prefers-reduced-motion:no-preference){
+ ::view-transition-old(root){animation:folio-leave .31s ease-out both}
+ ::view-transition-new(root){animation:folio-open .38s cubic-bezier(.21,.73,.23,1) both}
+ @keyframes folio-leave{to{opacity:.55;transform:translateY(-7px)}}
+ @keyframes folio-open{from{clip-path:inset(0 0 100% 0);transform:translateY(9px)}to{clip-path:inset(0);transform:translateY(0)}}
+}
+@media(prefers-reduced-motion:reduce){
+ ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation-duration:.001ms!important}
+}

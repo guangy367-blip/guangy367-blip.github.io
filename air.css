@@ -1,0 +1,51 @@
+/* The opening light travels across the branch like light through a high window. */
+.studio-air,.air-light,.air-dust{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.air-light{inset:-10% -8%;background:radial-gradient(ellipse at 59% 87%,#cb925142,transparent 43%),linear-gradient(117deg,transparent 45%,#c79e7010 48%,transparent 51%,#edcb8d0a 53%,transparent 57%);animation:studio-light 13s ease-in-out infinite alternate}
+.air-dust{inset:7% 8%;opacity:.68;background:radial-gradient(circle at 25% 72%,#f0dabd 0 .8px,transparent 1.7px),radial-gradient(circle at 41% 55%,#f3af7b 0 .9px,transparent 1.7px),radial-gradient(circle at 52% 70%,#f3c3ad 0 1px,transparent 1.8px),radial-gradient(circle at 58% 45%,#eac9ad 0 .75px,transparent 1.6px),radial-gradient(circle at 70% 84%,#d8a98d 0 1px,transparent 1.8px),radial-gradient(circle at 78% 62%,#f0dabd 0 .8px,transparent 1.6px),radial-gradient(circle at 31% 87%,#eeb993 0 .65px,transparent 1.4px),radial-gradient(circle at 85% 39%,#eeb993 0 1px,transparent 1.7px);animation:studio-dust 9s ease-in-out infinite alternate}
+@keyframes studio-light{from{transform:translate(-3%,1%) rotate(-3deg);opacity:.38}to{transform:translate(3%,-2%) rotate(3deg);opacity:.86}}
+@keyframes studio-dust{from{transform:translate(-8px,10px);opacity:.27}to{transform:translate(7px,-12px);opacity:.78}}
+#top:not(.air-awake) .studio-air>div{animation-play-state:paused}
+.cover-track{position:relative}
+.cover-track picture{transform-origin:55% 53%;pointer-events:none}
+.branch-touch,.branch-key{position:absolute;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.branch-touch{inset:0;width:100%;height:100%;padding:0;cursor:crosshair;background:transparent;clip-path:polygon(0 80%,49% 44%,69% 0,77% 0,64% 38%,91% 9%,95% 19%,61% 55%,100% 65%,100% 81%,62% 66%,71% 100%,61% 100%,53% 62%,0 100%)}
+.branch-key{top:69%;left:38%;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;color:#edd7bd;background:#241d17d6;border:1px solid #bc92625e;border-radius:99px;cursor:pointer;font:400 12px/1.3 var(--sans);letter-spacing:.08em;transform:rotate(7deg);white-space:nowrap}
+.branch-key i{font:18px/1 Georgia,serif;color:#efa982}
+.branch-key:is(:hover,:focus-visible),.cover-track:has(.branch-touch:hover) .branch-key{border-color:#e7b997;background:#38261d}
+.branch-echo{position:absolute;left:55%;top:52%;width:1px;height:1px;pointer-events:none}
+.branch-echo i{position:absolute;left:-17px;top:-17px;width:34px;height:34px;border:1px solid #f4bc8a;border-radius:50%;opacity:0}
+.branch-echo i:nth-child(2){border-color:#bd6a4b}.branch-echo i:nth-child(3){border-color:#e1c9aa}
+[data-music]{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.music-bars{display:inline-flex;gap:2px;align-items:center;height:18px}
+.music-bars i{width:2px;height:6px;display:block;background:currentColor;border-radius:2px;transform-origin:center}
+.music-bars i:nth-child(2){height:13px}.music-bars i:nth-child(3){height:10px}.music-bars i:nth-child(4){height:5px}
+[data-music][aria-pressed=true] .music-bars i{animation:pluck-bars .95s ease-in-out infinite alternate}
+[data-music][aria-pressed=true] .music-bars i:nth-child(2){animation-delay:-.72s}
+[data-music][aria-pressed=true] .music-bars i:nth-child(3){animation-delay:-.34s}
+[data-music][aria-pressed=true] .music-bars i:nth-child(4){animation-delay:-.18s}
+@keyframes pluck-bars{to{transform:scaleY(.32)}}
+body.music-away footer [data-music][aria-pressed=true]{position:fixed;z-index:8;right:max(15px,env(safe-area-inset-right));bottom:max(17px,env(safe-area-inset-bottom));padding:8px 13px;min-height:40px;border:1px solid #8c7965;border-radius:99px;background:#25211d;color:#f1e7d4;box-shadow:0 2px 12px #0003}
+@media(max-width:760px) and (orientation:portrait){
+ .cover-nav nav{gap:clamp(8px,2.3vw,15px)}.cover-nav [data-music]{min-width:27px;min-height:38px}
+ .cover-nav .music-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .branch-key{top:78%;left:37%;font-size:11px;padding:5px 8px}
+ .air-dust{inset:2% -7%}
+}
+@media(max-height:545px) and (orientation:landscape){
+ .cover-year{visibility:hidden}.branch-key{top:67%;left:49%;font-size:10px;padding:4px 7px}
+}
+@media(prefers-reduced-motion:reduce){
+ .studio-air>div,[data-music] .music-bars i{animation:none!important}.air-light{opacity:.5}
+}
+
+.film-ready .intro-name .name-lockup{animation:signature-entry .86s cubic-bezier(.16,.82,.24,1) both}
+.film-ready .intro-name .intro-roman{animation:roman-entry .78s .06s cubic-bezier(.16,.82,.24,1) both}
+.film-ready .intro-name .intro-note,.film-ready .intro-name .intro-actions{animation:roman-entry .66s .12s ease-out both}
+@keyframes signature-entry{from{clip-path:inset(0 -4% 85% -4%);transform:translateY(.06em)}to{clip-path:inset(-10% -4% -10% -4%);transform:translateY(0)}}
+@keyframes roman-entry{from{opacity:.05;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+body>footer [data-music] span{flex-basis:auto;margin:0}
+@media print{.studio-air,.branch-key,[data-music],.branch-echo{display:none!important}}
+
+@media(max-width:760px) and (orientation:portrait) and (max-height:630px){
+ #top.folio-cover #badge-rig{--badge-w:clamp(121px,22.5svh,146px);inset:51px 5.5% auto auto;height:41svh}
+}
