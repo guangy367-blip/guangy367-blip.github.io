@@ -27,6 +27,10 @@
     <div class="mp-tray" role="group" aria-label="选择灵猴"></div>
     <div class="mp-tools"><button type="button" class="mp-remove">取下灵猴</button><button type="button" class="mp-reset">还原</button></div><p class="mp-announcement" role="status" aria-live="polite" aria-atomic="true"></p>
   </aside></div>`;
+  if (root.closest("#workshop")) {
+    root.querySelector(".mp-head").remove();
+    root.setAttribute("aria-labelledby","activity");
+  }
   const $=s=>root.querySelector(s);
   const stone=$(".mp-stone"), pieces=$(".mp-pieces"), tray=$(".mp-tray"), ghost=$(".mp-ghost"),status=$(".mp-announcement");
   const thumbButtons=[],piecesOnStone=[],ports=[];

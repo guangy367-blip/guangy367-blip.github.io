@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" aria-label="喜乐祝福牌">
+<path d="M600 23 C919 23 1177 281 1177 600 C1177 919 919 1177 600 1177 C281 1177 23 919 23 600 C23 281 281 23 600 23 Z" fill="#FFF9EE"/>
+<path d="M600 78 C888.3 78 1122 311.7 1122 600 C1122 888.3 888.3 1122 600 1122 C311.7 1122 78 888.3 78 600 C78 311.7 311.7 78 600 78 Z" fill="#F8DFB0" stroke="#DA922B" stroke-width="18"/>
+<g fill="none" stroke="#CE6455" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+<path d="M378 815 C345 815 321 800 324 774 C326 741 369 721 411 745 C415 710 449 686 484 701 C508 668 551 667 578 702 C608 679 649 693 662 722 C700 713 742 740 742 775 C740 801 712 817 679 817 H405"/>
+<path d="M506 765 C528 738 555 742 574 763 C592 743 615 748 633 767 M526 779 L529 778 M553 785 C565 801 585 800 600 784 M631 779 L635 776"/>
+</g>
+<text x="600" y="600" text-anchor="middle" fill="#1D2524" font-family="'Source Han Serif CN','思源宋体 CN','Source Han Serif SC',serif" font-size="240">喜乐</text>
+</svg>

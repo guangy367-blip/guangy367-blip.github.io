@@ -2,12 +2,12 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<style>@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}</style>
+<script>if(location.protocol!=="file:"){const s=document.createElement("style");s.textContent="@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}";document.head.append(s)}</script>
 <meta name="theme-color" content="#141311">
 <title>作品长卷 · 何星霆</title>
 <link rel="icon" type="image/svg+xml" href="media/stamp.svg">
-<link rel="stylesheet" href="case.css?v=1123inline"><link rel="stylesheet" href="media-guard.css?v=1123e">
-<script defer src="catalog.js?v=1123e"></script><script defer src="case.js?v=1123inline"></script><script defer src="media-guard.js?v=1123e"></script>
+<link rel="stylesheet" href="case.css?v=cases-play1"><link rel="stylesheet" href="media-guard.css?v=1123e">
+<script defer src="catalog.js?v=1123e"></script><script defer src="case.js?v=cases-play1"></script><script defer src="media-guard.js?v=1123e"></script>
 <link rel="stylesheet" href="folio-turn.css?v=1123turn7b">
 </head>
 <body>
@@ -16,10 +16,11 @@
 <aside class="side" aria-label="作品与章节导航">
   <header class="side-head"><a class="brand" href="index.html"><span>何星霆</span><small lang="en">HE XINGTING</small></a><a class="home" href="index.html#works">返回作品索引</a></header>
   <div class="outline-title"><h1>作品长卷</h1><span>章节目录</span></div>
+  <a id="desktop-play" class="reader-play"><span>进入作品互动</span><strong id="play-name"></strong><i aria-hidden="true">↗</i></a>
   <nav id="outline" class="outline" aria-label="选择项目与章节"></nav>
   <div class="progress"><div><strong id="read-name"></strong><span id="read-step"></span></div><progress id="meter" max="100" value="0" aria-label="当前项目阅读进度"></progress></div>
 </aside>
-<div class="mobile-bar"><a class="m-home" href="index.html#works" aria-label="返回首页作品索引">作品索引</a><label><span class="sr">选择项目</span><select id="work-select"></select></label><label><span class="sr">选择章节</span><select id="section-select"></select></label></div>
+<div class="mobile-bar"><a class="m-home" href="index.html#works" aria-label="返回首页作品索引">作品索引</a><label><span class="sr">选择项目</span><select id="work-select"></select></label><label><span class="sr">选择章节</span><select id="section-select"></select></label><a class="m-play" id="mobile-play">互动 ↗</a></div>
 <main id="reader" tabindex="-1" aria-label="四个项目连续展板"><div id="pages"></div><footer class="end"><span>感谢阅览</span><a href="index.html#works">返回作品索引</a></footer></main>
 </div>
 <noscript><p>请启用 JavaScript 浏览作品长卷，或<a href="index.html">返回首页</a>。</p></noscript>

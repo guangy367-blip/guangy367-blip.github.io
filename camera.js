@@ -7,7 +7,8 @@
   const branch = stage.querySelector(".cover-track"), heading = stage.querySelector(".cover-heading");
   const cord = stage.querySelector(".film-lanyard"), portrait = stage.querySelector(".portrait-composition");
   const resume = [...stage.querySelectorAll(".cv-kicker,.cv-social,.cv-nameplate,.cv-column")];
-  const method = stage.querySelector(".intro-method .intro-copy"), knot = stage.querySelector(".knot-exhibit");
+  const method = stage.querySelector(".thread-writing"), knot = stage.querySelector(".thread-art");
+  const stitches = [...method.querySelectorAll(".thread-station")];
   const cue = stage.querySelector(".film-cue"), hint = cue.querySelector(".film-hint");
   const gauge = cue.querySelector(".film-meter i"), reader = stage.querySelector(".camera-reader");
   const reduced = matchMedia("(prefers-reduced-motion:reduce)");
@@ -65,9 +66,17 @@
       });
     }
     if(q>.595) {
-      const typed=step(q,.704,.885);
-      layer(method,typed,move(0,17*(1-typed)));
-      layer(knot,knotAlpha,move(19*(1-intoMethod),3*(1-intoMethod),.85+.15*intoMethod,-9*(1-intoMethod)));
+      const threadIn=step(q,.635,.888);
+      const pen=step(q,.683,.815);
+      const travelling=threadIn<1 && !reduced.matches;
+      knot.classList.toggle("thread-arriving",travelling);
+      if(travelling) knot.style.setProperty("--thread-edge",((1-threadIn)*100).toFixed(2)+"%");
+      layer(knot,knotAlpha,move(0,3*(1-intoMethod),1+.025*(1-intoMethod)));
+      layer(method,pen,move(0,3*(1-pen)));
+      stitches.forEach((station,i)=>{
+        const t=step(q,.69+i*.047,.79+i*.054);
+        layer(station,t,move(0,2*(1-t)));
+      });
     }
     gauge.style.transform="scaleX("+(.065+.935*p).toFixed(3)+")";
     stage.dataset.knotVisible=String(knotAlpha>0);

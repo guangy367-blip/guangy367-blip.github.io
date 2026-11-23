@@ -1,0 +1,20 @@
+.official-song{position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:max(16px,env(safe-area-inset-left));z-index:12;box-sizing:border-box;width:min(355px,calc(100vw - 32px));padding:4px 7px 3px;background:#f0e9dc;color:#2b2621;border:1px solid #a49b8b;border-radius:7px;box-shadow:0 7px 26px #0a090832;font:13px/1.4 "Microsoft YaHei","PingFang SC",sans-serif;text-align:left}
+.official-song[hidden],.official-song [hidden]{display:none!important}
+.official-song:focus{outline:none}
+.official-song header,.official-song .song-mini{display:flex;align-items:center;gap:3px}
+.official-song header{padding:0 3px}
+.official-song .song-source,.official-song button{background:transparent;border:0;border-radius:3px;box-shadow:none;min-height:38px;color:inherit;font:inherit;display:inline-flex;align-items:center;justify-content:center;gap:.25em;text-decoration:none;cursor:pointer}
+.official-song button{padding:0 7px}
+.official-song .song-source{letter-spacing:.01em;flex:1;justify-content:flex-start}
+.official-song .song-source:hover{text-decoration:underline;text-underline-offset:3px}
+.official-song :is(.song-source,button):focus-visible{outline:2px solid #7b4539;outline-offset:1px}
+.official-song .song-frame{height:86px}
+.official-song iframe{display:block;width:100%;max-width:none;height:86px;border:0;background:transparent}
+.official-song.is-compact{width:auto;padding:2px 4px;border-radius:24px}
+.official-song.is-compact .song-frame{position:absolute;top:0;left:0;width:300px;height:86px;clip-path:inset(50%);pointer-events:none}
+.official-song .song-mini{gap:0}
+.official-song .song-mini button{border-radius:18px;min-height:38px;min-width:39px}
+.official-song .song-reveal{font-family:Georgia,serif;font-size:22px}
+.official-song .song-mini .song-stop{min-width:44px}
+@media(max-width:470px){.official-song{left:10px;bottom:max(10px,env(safe-area-inset-bottom));width:min(355px,calc(100vw - 20px))}.official-song button{min-height:42px}.official-song .song-mini button{min-height:40px}}
+@media print{.official-song{display:none}}

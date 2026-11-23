@@ -2,6 +2,7 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const catalog = window.catalog || {};
+  const playNames = {monkey:"磁吸猴山",cabinet:"拉开抽屉",beasts:"为瑞兽配愿",dufu:"抽纸起风"};
   const order = ["monkey", "cabinet", "beasts", "dufu"].filter(key => catalog[key]?.sections?.length);
   if (!order.length) { $("pages").textContent = "作品暂时无法读取。请返回作品索引重试。"; return; }
 
@@ -100,6 +101,12 @@
       }
     }
     current=index;
+    const playHref="case-play.html?p="+record.key+"&from="+record.number;
+    for (const id of ["desktop-play","mobile-play"]) {
+      $(id).href=playHref;
+      $(id).setAttribute("aria-label",catalog[record.key].title+" · "+playNames[record.key]+"互动");
+    }
+    $("play-name").textContent=playNames[record.key];
     record.link.setAttribute("aria-current","location");
     $("section-select").value=String(index);$("read-name").textContent=catalog[record.key].title;
     $("read-step").textContent=record.number+" / "+group.count;

@@ -1,149 +1,142 @@
 (() => {
-  const button = document.querySelector(".knot-object");
-  if (!button) return;
-  const canvas = button.querySelector("canvas");
-  const fallback = button.querySelector(".knot-fallback");
-  const stage = document.getElementById("top");
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  const tau = 2 * Math.PI;
-
-  // A closed trefoil with a circular cross section. The same mesh is reused at every angle.
-  function knotMesh() {
-    const rings = 180, sides = 32, vertices = [], indices = [];
-    const point = t => [(1.87 + .8 * Math.cos(3*t)) * Math.cos(2*t),
-      (1.87 + .8 * Math.cos(3*t)) * Math.sin(2*t), .94*Math.sin(3*t)];
-    const unit = v => v.map(x => x / Math.hypot(...v));
-    const cross = (a,b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
-    for (let i = 0; i <= rings; i++) {
-      const t = i * tau / rings, c = point(t), lo = point(t-.001), hi = point(t+.001);
-      const tangent = unit(hi.map((n,k) => n-lo[k]));
-      const n = unit(cross(tangent,[0,0,1])), b = cross(tangent,n);
-      for (let j = 0; j <= sides; j++) {
-        const phi = j*tau/sides;
-        const normal = n.map((v,k) => v*Math.cos(phi)+b[k]*Math.sin(phi));
-        vertices.push(...c.map((v,k) => v+.28*normal[k]), ...normal, i/rings, j/sides);
-        if (i < rings && j < sides) {
-          const at = i*(sides+1)+j, next = at+sides+1;
-          indices.push(at,next,at+1,at+1,next,next+1);
-        }
-      }
-    }
-    return {vertices:new Float32Array(vertices),indices:new Uint16Array(indices)};
+  const scene = document.querySelector(".intro-method");
+  if (!scene) return;
+  const art = scene.querySelector(".thread-art");
+  const svg = art.querySelector(".thread-trace");
+  const trace = svg.querySelector(".thread-glint");
+  const stations = [...scene.querySelectorAll(".thread-station")];
+  const portrait = matchMedia("(max-width:860px) and (orientation:portrait)");
+  const reduced = matchMedia("(prefers-reduced-motion:reduce)");
+  const curves = {
+  "wide": {
+    "width": 1600,
+    "height": 850,
+    "path": "M -60 493 C 132 538 286 513 421 434 C 540 375 672 228 771 209 C 920 177 940 307 812 423 C 711 515 623 498 643 400 C 668 277 859 286 966 409 C 1110 572 1050 675 909 618 C 751 554 772 388 921 370 C 1080 353 1154 462 1292 396 C 1433 332 1524 249 1660 281",
+    "stitches": [
+      [
+        255,
+        494
+      ],
+      [
+        899,
+        614
+      ],
+      [
+        1288,
+        399
+      ]
+    ]
+  },
+  "tall": {
+    "width": 480,
+    "height": 860,
+    "path": "M -29 165 C 90 201 59 306 161 338 C 247 382 367 371 367 308 C 369 241 279 248 251 307 C 195 401 306 490 369 449 C 433 406 338 336 277 379 C 202 431 190 554 251 587 C 320 622 366 535 308 510 C 217 470 112 558 109 651 C 106 735 202 779 188 905",
+    "stitches": [
+      [
+        78,
+        246
+      ],
+      [
+        210,
+        438
+      ],
+      [
+        109,
+        660
+      ]
+    ]
   }
-  function renderer() {
-    const gl = canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:false,powerPreference:"low-power"});
-    if (!gl) return null;
-    const vs = [
-      "attribute vec3 pos;attribute vec3 normal;attribute vec2 tex;",
-      "uniform vec3 angle;uniform vec2 aspect;varying vec3 N;varying vec2 uv;varying float depth;",
-      "vec3 turn(vec3 v){vec3 c=cos(angle),s=sin(angle);",
-      "v=vec3(c.y*v.x+s.y*v.z,v.y,-s.y*v.x+c.y*v.z);",
-      "v=vec3(v.x,c.x*v.y-s.x*v.z,s.x*v.y+c.x*v.z);",
-      "return vec3(c.z*v.x-s.z*v.y,s.z*v.x+c.z*v.y,v.z);}",
-      "void main(){vec3 p=turn(pos);N=turn(normal);uv=tex;depth=p.z;",
-      "gl_Position=vec4(.326*aspect*p.xy/(1.-.045*p.z),-.2*p.z,1.);}"
-    ].join("\n");
-    const fs = [
-      "precision mediump float;varying vec3 N;varying vec2 uv;varying float depth;",
-      "void main(){vec3 n=normalize(N),l=normalize(vec3(-.63,.91,.88)),v=vec3(0.,0.,1.);",
-      "float key=max(0.,dot(n,l)),edge=pow(1.-max(n.z,0.),2.8);",
-      "float roll=uv.y*5.-uv.x*59.;float twist=cos(6.2832*roll);",
-      "float fibre=cos(6.2832*(uv.y*25.-uv.x*132.+.16*sin(6.2832*roll)));",
-      "float groove=smoothstep(.05,.99,twist);",
-      "vec3 flax=mix(vec3(.43,.064,.065),vec3(.72,.18,.13),.42+depth*.10);",
-      "float light=.36+.8*key+.13*max(0.,dot(n,normalize(vec3(.8,-.2,.6))));",
-      "vec3 col=flax*light*(.82+.18*groove+.025*fibre);",
-      "col+=vec3(.46,.30,.25)*pow(max(0.,dot(n,normalize(l+v))),18.)*(.26+.74*groove);",
-      "col+=vec3(.32,.12,.11)*edge*(.28+.72*key);gl_FragColor=vec4(col,1.);}"
-    ].join("\n");
-    const program = gl.createProgram();
-    for (const [type,source] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]) {
-      const shader = gl.createShader(type);
-      gl.shaderSource(shader,source); gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader,gl.COMPILE_STATUS)) return null;
-      gl.attachShader(program,shader); gl.deleteShader(shader);
-    }
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program,gl.LINK_STATUS)) return null;
-    gl.useProgram(program);
-    const mesh = knotMesh();
-    gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER,mesh.vertices,gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,gl.createBuffer());
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,mesh.indices,gl.STATIC_DRAW);
-    for (const [name,size,offset] of [["pos",3,0],["normal",3,12],["tex",2,24]]) {
-      const loc = gl.getAttribLocation(program,name);
-      gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,size,gl.FLOAT,false,32,offset);
-    }
-    const angle = gl.getUniformLocation(program,"angle"), aspect = gl.getUniformLocation(program,"aspect");
-    gl.enable(gl.DEPTH_TEST); gl.clearColor(0,0,0,0);
-    return (pitch,yaw,roll,w,h) => {
-      const pixelScale = Math.min(devicePixelRatio||1,1.5,1120/Math.max(w,h));
-      const width=Math.max(1,Math.round(w*pixelScale)), height=Math.max(1,Math.round(h*pixelScale));
-      if (width!==canvas.width||height!==canvas.height) {canvas.width=width;canvas.height=height}
-      gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-      gl.uniform2f(aspect,Math.min(w,h)/w,Math.min(w,h)/h);gl.uniform3f(angle,pitch,yaw,roll);
-      gl.drawElements(gl.TRIANGLES,mesh.indices.length,gl.UNSIGNED_SHORT,0);
-    };
-  }
+};
+  let samples = [], distances = [], selected = 0, frame = 0, light = null, total = 0;
 
-  let draw, armed=false, attempted=false, visible=false, reveal=0, frame=0;
-  let w=1,h=1,yaw=-.36,pitch=.22,goalYaw=yaw,goalPitch=pitch;
-  function render() {
-    frame=0;
-    if (!visible || reveal<=0 || document.hidden) return;
-    if (!attempted) {
-      attempted=true;
-      try { draw=renderer() } catch { draw=null }
-      button.dataset.render=draw?"mesh":"poster";
-    }
-    const blend = reduced.matches ? 1 : .24;
-    yaw+=(goalYaw-yaw)*blend; pitch+=(goalPitch-pitch)*blend;
-    const turn=yaw;
-    if (draw) draw(pitch,turn,-.32,w,h);
-    else fallback.style.transform="rotate("+((turn+.36)*18)+"deg) scaleX("+(.88+.12*Math.cos(turn+.36))+")";
-    if (Math.abs(goalYaw-yaw)+Math.abs(goalPitch-pitch)>.003) wake();
+  function geometry() {
+    cancelPulse();
+    const view = portrait.matches ? curves.tall : curves.wide;
+    svg.setAttribute("viewBox", `0 0 ${view.width} ${view.height}`);
+    trace.setAttribute("d", view.path);
+    total = trace.getTotalLength();
+    samples = Array.from({length:501}, (_,i) => {
+      const point = trace.getPointAtLength(total*i/500);
+      return {x:point.x/view.width, y:point.y/view.height, length:total*i/500};
+    });
+    distances = view.stitches.map(([x,y], i) => {
+      const nearest = samples.reduce((best, p) => {
+        const gap = Math.hypot(p.x*view.width-x, p.y*view.height-y);
+        return gap < best.gap ? {gap,p} : best;
+      }, {gap:Infinity}).p;
+      stations[i].style.setProperty("--pin-x", (100*nearest.x).toFixed(2)+"%");
+      stations[i].style.setProperty("--pin-y", (100*nearest.y).toFixed(2)+"%");
+      return nearest.length;
+    });
   }
-  function wake(){if (armed && !frame && visible && reveal>0 && !document.hidden)frame=requestAnimationFrame(render)}
-  function resize(){w=button.clientWidth||1;h=button.clientHeight||1;wake()}
-  new ResizeObserver(resize).observe(button);
-  new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;wake()}).observe(stage);
-  window.addEventListener("film-progress",event=>{const wasVisible=reveal>0;reveal=event.detail.knotReveal;if(!wasVisible && reveal>0)wake()});
-  reveal=stage.dataset.knotVisible==="true"?1:0;
-  document.addEventListener("visibilitychange",wake);
-  canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();draw=null;button.dataset.render="poster";wake()});
-  canvas.addEventListener("webglcontextrestored",()=>{attempted=false;wake()});
-
-  // Scrolling uses a still rendered from this mesh. Initialise the renderer on interaction.
-  button.dataset.render="poster";
-  function arm(){armed=true;wake()}
-  button.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse" && reveal>.995)arm()});
-  button.addEventListener("focus",arm);
-  let gesture=null, suppressClick=false;
-  button.addEventListener("pointerdown",e=>{
-    if (!e.isPrimary || e.button!==0) return;
-    arm();suppressClick=false;
-    gesture={id:e.pointerId,x:e.clientX,y:e.clientY,pitch:goalPitch,yaw:goalYaw,dragging:false};
-    button.setPointerCapture(e.pointerId);
+  function cancelPulse() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    light = null;
+    trace.style.opacity = "0";
+  }
+  function pulse(from,to) {
+    cancelPulse();
+    if (reduced.matches) return;
+    const start = performance.now();
+    const reach = Math.min(70, Math.abs(to-from)*.12);
+    const duration = Math.min(1200, 420+Math.abs(to-from)*.35);
+    function draw(time) {
+      const t = Math.min(1,Math.max(0,(time-start)/duration));
+      const position = from+(to-from)*t*t*(3-2*t);
+      const length = Math.max(.1,reach*Math.sin(Math.PI*t));
+      light = position;
+      trace.style.strokeDasharray = length+" "+(total+length+1);
+      trace.style.strokeDashoffset = String(-Math.max(0,position-length/2));
+      trace.style.opacity = String(.88*Math.min(1,t*6,(1-t)*5));
+      if(t<1) frame=requestAnimationFrame(draw);
+      else cancelPulse();
+    }
+    frame=requestAnimationFrame(draw);
+  }
+  function select(index) {
+    if(index===selected) {
+      pulse(Math.max(0,distances[index]-total*.14),distances[index]);
+      return;
+    }
+    const from = light ?? distances[selected];
+    selected = index;
+    stations.forEach((station,i) => {
+      station.querySelector("button").setAttribute("aria-pressed",String(i===index));
+      station.querySelector(".stitch-note").hidden=i!==index;
+      if (i===index) station.querySelector("button").setAttribute("aria-describedby","thread-note-"+i);
+      else station.querySelector("button").removeAttribute("aria-describedby");
+    });
+    pulse(from,distances[selected]);
+  }
+  stations.forEach((station,i) => {
+    const button = station.querySelector("button");
+    button.addEventListener("click",()=>select(i));
+    button.addEventListener("keydown",event=>{
+      const keys={ArrowLeft:(i+2)%3,ArrowRight:(i+1)%3,Home:0,End:2};
+      if(!(event.key in keys)) return;
+      event.preventDefault();
+      const index=keys[event.key];
+      select(index);
+      stations[index].querySelector("button").focus({preventScroll:true});
+    });
   });
-  button.addEventListener("pointermove",e=>{
-    if (!gesture || gesture.id!==e.pointerId) return;
-    const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;
-    if (!gesture.dragging && Math.max(Math.abs(dx),Math.abs(dy))<5) return;
-    gesture.dragging=true;
-    goalYaw=gesture.yaw+dx*4.3/Math.max(180,w);
-    goalPitch=gesture.pitch+dy*3/Math.max(180,h);
-    wake();
+  // The fabric has narrow hit geometry. Whitespace around it stays available for scrolling.
+  art.addEventListener("click",event=>{
+    const bounds=art.getBoundingClientRect();
+    const x=event.clientX-bounds.left, y=event.clientY-bounds.top;
+    let nearest=null, gap=Infinity;
+    for(const p of samples) {
+      const d=Math.hypot(p.x*bounds.width-x,p.y*bounds.height-y);
+      if(d<gap){ gap=d; nearest=p; }
+    }
+    if(!nearest || gap>Math.max(15,bounds.width*.011)) return;
+    const closest=distances.reduce((best,v,i)=>Math.abs(nearest.length-v)<Math.abs(nearest.length-distances[best]) ? i : best,0);
+    if(closest===selected) pulse(nearest.length,distances[selected]);
+    else select(closest);
   });
-  function end(e){if (gesture&&gesture.id===e.pointerId){suppressClick=gesture.dragging;gesture=null}}
-  button.addEventListener("pointerup",end);button.addEventListener("lostpointercapture",end);
-  button.addEventListener("click",e=>{
-    arm();if (!suppressClick || e.detail===0){goalYaw+=tau/5;wake()}
-    suppressClick=false;
-  });
-  button.addEventListener("keydown",e=>{
-    if (e.key!=="ArrowLeft" && e.key!=="ArrowRight") return;
-    e.preventDefault();arm();goalYaw+=e.key==="ArrowLeft"?-.42:.42;wake();
-  });
-  resize();
+  geometry();
+  portrait.addEventListener("change",geometry);
+  reduced.addEventListener("change",cancelPulse);
+  window.addEventListener("film-progress",()=>{if(frame && scene.inert)cancelPulse()});
 })();
