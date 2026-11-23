@@ -7,9 +7,8 @@
 .badge-cord,.badge-hardware,.badge-layer{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .badge-layer{z-index:2}
 .badge-hardware{z-index:3}
-.badge-anchor{display:none}
 .badge-mount{position:absolute;top:0;left:0;width:0;height:0;perspective:800px;perspective-origin:center}
-.badge-body{position:absolute;left:calc(var(--badge-w) / -2);top:-12px;width:var(--badge-w);height:var(--badge-h);transform-origin:50% 12px;transform-style:preserve-3d;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.badge-body{position:absolute;left:calc(var(--badge-w) / -2);top:-12px;width:var(--badge-w);height:var(--badge-h);transform-origin:50% 12px;transform-style:preserve-3d;pointer-events:auto;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;cursor:grab}
 .badge-body:focus-visible{outline:1px solid #e5d6bd;outline-offset:6px;border-radius:8px}
 .badge-body.is-grabbed{cursor:grabbing}
 .badge-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid #c6c3bc;border-radius:8px;padding:23px 13px 11px;overflow:hidden;color:#f5f2e9;
@@ -46,7 +45,6 @@
 @media(max-width:760px){
   #badge-rig{position:relative;inset:auto;width:100%;height:307px;grid-column:1/-1;align-self:stretch;margin:0 auto;--badge-w:149px}
   .studio #badge-rig{height:307px}
-  .badge-anchor{display:block}
   .badge-face{padding:20px 10px 8px}
   .badge-display{font-size:21px;margin:5px 0}
   .badge-name strong{font-size:16px}.badge-name small,.badge-rule,.badge-rule time,.badge-school{font-size:9px}
@@ -56,16 +54,14 @@
 
 /* Size the actual print, independently of the ribbon's drawing surface. */
 #top.folio-cover #badge-rig{
-  --badge-w:min(22.8vw,35svh);
+  --badge-w:min(24vw,38svh,430px);
   --badge-h:calc(var(--badge-w) * 1.33);
   --hole-y:clamp(11px,.99vw,21px);
   --eye-w:clamp(20px,1.9vw,39px);
-  --socket-inset:clamp(57px,8svh,100px);
-  position:absolute;inset:var(--socket-inset) 3.6% auto auto;width:34%;
-  height:calc(83svh - var(--socket-inset));z-index:4;pointer-events:none
+  position:absolute;inset:0 3.6% auto auto;width:34%;
+  height:85svh;z-index:4;pointer-events:none
 }
 #badge-rig .badge-body,#badge-rig .badge-control{pointer-events:auto}
-#badge-rig .badge-anchor{display:block}
 #badge-rig .badge-body{top:calc(0px - var(--hole-y));transform-origin:50% var(--hole-y)}
 #badge-rig .badge-mount{perspective:clamp(650px,62vw,1450px)}
 #badge-rig .badge-face{
@@ -89,10 +85,13 @@
 #badge-rig .badge-control{transition:opacity .19s;max-width:100%}
 #badge-rig:has(.is-grabbed) .badge-control{opacity:0;pointer-events:none}
 @media(max-width:760px) and (orientation:portrait){
-  #top.folio-cover #badge-rig{--badge-w:clamp(153px,42vw,242px);inset:62px 5.5% auto auto;width:52%;height:clamp(280px,42svh,470px)}
+  #top.folio-cover #badge-rig{--badge-w:clamp(144px,42vw,242px);inset:0 5.5% auto auto;width:52%;height:clamp(330px,49svh,510px)}
 }
 @media(max-height:480px) and (orientation:landscape){
-  #top.folio-cover #badge-rig{--badge-w:min(24vw,39svh);inset:42px 4% auto auto;width:29%;height:73svh}
+  #top.folio-cover #badge-rig{--badge-w:min(24vw,39svh);inset:0 4% auto auto;width:29%;height:83svh}
+}
+@media(max-width:760px) and (orientation:portrait) and (max-height:630px){
+  #top.folio-cover #badge-rig{--badge-w:clamp(118px,22svh,140px);height:48svh}
 }
 @media(max-width:400px), (max-height:480px) and (orientation:landscape){
   #badge-rig .badge-back{padding:17px 9px 8px}

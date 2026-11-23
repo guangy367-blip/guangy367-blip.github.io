@@ -13,7 +13,7 @@
       <use href="#rig-thread" stroke="#242421" stroke-width="6.2"/>
       <use href="#rig-thread" stroke="#979087" stroke-width="3.6" stroke-dasharray="0.75 3.5" opacity=".75"/>
       <use class="badge-stitch" href="#rig-thread" stroke="#ded8c9" stroke-width="1.1" stroke-dasharray="1 7 3 7" opacity=".82"/>
-    </g><g class="badge-anchor"><rect x="-8" y="-2" width="16" height="6" rx="2" fill="#57554f" stroke="#8e8c84" stroke-width=".8"/><circle cx="-5.7" cy="1" r=".8" fill="#141413"/><circle cx="5.7" cy="1" r=".8" fill="#141413"/></g></svg>
+    </g></svg>
     <div class="badge-layer"><div class="badge-mount"><div class="badge-body" role="group" tabindex="0" aria-label="何星霆的求职挂牌，正面个人简介，背面服务客户。按空格翻面，方向键甩动">
       <i class="badge-edge" aria-hidden="true"></i><div class="badge-face badge-front">
         <div class="badge-rule"><span>作品集简历</span><time>2026</time></div>
@@ -46,7 +46,6 @@
   const mount = rig.querySelector(".badge-mount");
   const cord = rig.querySelector("#rig-thread");
   const clip = rig.querySelector(".badge-clip");
-  const socket = rig.querySelector(".badge-anchor");
   const front = rig.querySelector(".badge-front");
   const back = rig.querySelector(".badge-back");
   const control = rig.querySelector(".badge-control");
@@ -55,7 +54,7 @@
   // The fixed socket and the moving snap hook constrain the two ends of
   // a chain of short, inextensible spans. Interior knots retain momentum.
   const knots=Array.from({length:12},()=>({x:0,y:0,px:0,py:0}));
-  let halfTurn=0,anchor=0,rest=0,leftReach=0,rightReach=0,strandLength=0,metalScale=1;
+  let halfTurn=0,anchor=0,cordX=0,rest=0,leftReach=0,rightReach=0,strandLength=0,metalScale=1;
   let scenePhase=0,previousPhase=0;
   let drag=null,visible=true,frame=0,last=0,didEnter=false,resetCord=true,lastTap=-1000;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -63,28 +62,53 @@
   const restRoll=()=>-6+scenePhase*7;
   const restX=()=>Math.sin(scenePhase*Math.PI)*Math.min(30,rest*.11);
 
+  function cordEntry() {
+    const nav=rig.closest("#top")?.querySelector(".cover-nav");
+    if(!nav)return anchor-8;
+    const controls=[...nav.querySelectorAll("a,button")].map(el=>el.getBoundingClientRect())
+      .filter(rect=>rect.width>0).sort((a,b)=>a.left-b.left);
+    if(!controls.length)return anchor-8;
+    const restCentre=rig.offsetLeft+anchor,margin=Math.min(10,metalScale*5.5+.08);
+    const gaps=[];
+    let previous=8;
+    for(const rect of controls){
+      if(rect.left-margin>=previous)gaps.push([previous,rect.left-margin]);
+      previous=Math.max(previous,rect.right+margin);
+    }
+    if(previous<innerWidth-6)gaps.push([previous,innerWidth-6]);
+    if(!gaps.length)return anchor-8;
+    const target=gaps.map(([lo,hi])=>clamp(restCentre-8,lo,hi))
+      .sort((a,b)=>Math.abs(a-restCentre)-Math.abs(b-restCentre))[0];
+    return target-rig.offsetLeft;
+  }
   function measure() {
     const w=rig.clientWidth,h=rig.clientHeight,bh=body.offsetHeight,bw=body.offsetWidth;
     anchor=w/2;
-    socket.setAttribute("transform","translate(" + (anchor-8) + " 0)");
     metalScale=clamp(bw/228,.74,2);
-    rest=Math.max(42,Math.min(h*.43,h-bh-48));
+    const navHeight=rig.closest("#top")?.querySelector(".cover-nav")?.offsetHeight||0;
+    const clearance=navHeight+bw*.08+16;
+    rest=Math.max(clearance,Math.min(h*.45,h-bh-48));
+    cordX=cordEntry();
+    // Let the print settle under the cord. The anchor and its weighted snap
+    // can then hang nearly plumb through the gap between navigation labels.
+    anchor+=clamp(cordX+3.5*metalScale-anchor,-40,40);
     const centre=rig.getBoundingClientRect().left+anchor;
     leftReach=Math.max(22,Math.min(rest*.96,centre-bw*.52-8));
     rightReach=Math.max(22,Math.min(rest*.96,innerWidth-centre-bw*.52-8));
-    strandLength=Math.hypot(8+32*metalScale*Math.sin(-6*Math.PI/180),rest-32*metalScale*Math.cos(-6*Math.PI/180)+5)*1.006;
+    strandLength=Math.hypot(anchor-cordX+32*metalScale*Math.sin(-6*Math.PI/180),rest-32*metalScale*Math.cos(-6*Math.PI/180)+5)*1.006;
     rig.querySelectorAll(".badge-cord use").forEach(use=>{
       if(!use.dataset.baseWidth)use.dataset.baseWidth=use.getAttribute("stroke-width");
       use.setAttribute("stroke-width",Number(use.dataset.baseWidth)*metalScale);
     });
     resetCord=true;
     rig.style.setProperty("--badge-label-top", Math.round(rest+bh+7)+"px");
+    control.style.left=anchor+"px";
     rig.querySelectorAll(".badge-cord,.badge-hardware").forEach(svg=>svg.setAttribute("viewBox","0 0 "+w+" "+h));
     if(!didEnter && w>0 && h>0) {
       didEnter=true;
       if(!reduced.matches) Object.assign(state,{
-        x:-Math.min(leftReach*.82,172),y:-Math.min(rest*.74,250),
-        angle:42,pitch:-42,yaw:-106,vx:155,vy:260,vp:110,vz:160
+        x:-Math.min(leftReach*.35,64),y:-Math.min(rest*.2,48,(rest-clearance)*.65),
+        angle:12,pitch:-12,yaw:-23,vx:52,vy:65,vp:35,vz:40
       });
     }
     paint(0);wake();
@@ -124,7 +148,12 @@
       }
       for(let i=1;i<n;i++)energy=Math.max(energy,Math.hypot(knots[i].x-knots[i].px,knots[i].y-knots[i].py));
     }
-    let path="M"+sx.toFixed(2)+" "+sy;
+    // Continue the fixed end far above the composition. Its end cap can
+    // never appear inside a scroll-driven or rotated camera frame.
+    const extension=Math.max(1000,innerHeight*2);
+    const first=knots[1];
+    const slope=clamp((first.x-sx)/Math.max(1,first.y-sy),-.85,.85);
+    let path="M"+(sx-extension*slope).toFixed(2)+" "+(sy-extension)+" L"+sx.toFixed(2)+" "+sy;
     for(let i=1;i<n;i++){
       const a=knots[i],b=knots[i+1];
       path+=" Q"+a.x.toFixed(2)+" "+a.y.toFixed(2)+" "+((a.x+b.x)/2).toFixed(2)+" "+((a.y+b.y)/2).toFixed(2);
@@ -136,7 +165,7 @@
     const x=anchor+state.x, y=rest+state.y;
     const angle=state.angle*Math.PI/180;
     const endX=x+32*metalScale*Math.sin(angle),endY=y-32*metalScale*Math.cos(angle);
-    const energy=stepRope(anchor-8,-5,endX,endY,dt);
+    const energy=stepRope(cordX,-5,endX,endY,dt);
     mount.style.transform=`translate3d(${x}px,${y}px,0)`;
     body.style.transform=`rotateZ(${state.angle}deg) rotateY(${state.yaw}deg) rotateX(${state.pitch}deg)`;
     body.style.setProperty("--glaze",(Math.sin(state.yaw*Math.PI/180)*22+state.pitch*.18).toFixed(2)+"%");
@@ -194,17 +223,27 @@
     }
   });
   body.addEventListener("pointerdown",e=>{
-    if(drag || e.button!==0 || e.target.closest("a,button"))return;
+    if(drag || !e.isPrimary || e.button!==0 || e.target.closest("a,button"))return;
     const box=body.getBoundingClientRect();
     drag={id:e.pointerId,x:e.clientX,y:e.clientY,ox:state.x,oy:state.y,tx:state.x,ty:state.y,
       baseYaw:state.yaw,yaw:state.yaw,pitch:state.pitch,grip:clamp((e.clientX-box.left)/Math.max(box.width,1)*2-1,-1,1),
-      dx:0,dy:0,lastX:e.clientX,lastY:e.clientY,time:e.timeStamp,vx:0,vy:0,moved:false};
-    body.classList.add("is-grabbed");body.setPointerCapture(e.pointerId);
-    body.focus({preventScroll:true});wake();
+      dx:0,dy:0,lastX:e.clientX,lastY:e.clientY,time:e.timeStamp,vx:0,vy:0,moved:false,
+      contact:e.pointerType!=="mouse",caught:e.pointerType==="mouse"};
+    if(drag.caught){
+      body.classList.add("is-grabbed");body.setPointerCapture(e.pointerId);
+      body.focus({preventScroll:true});
+    }
+    wake();
   });
   body.addEventListener("pointermove",e=>{
     if(!drag || e.pointerId!==drag.id)return;
     drag.dx=e.clientX-drag.x;drag.dy=e.clientY-drag.y;
+    if(drag.contact&&!drag.caught){
+      if(Math.max(Math.abs(drag.dx),Math.abs(drag.dy))<8)return;
+      if(Math.abs(drag.dy)>=Math.abs(drag.dx)*.9){release(e,true);return}
+      drag.caught=true;
+      body.classList.add("is-grabbed");body.setPointerCapture(e.pointerId);
+    }
     if(Math.hypot(drag.dx,drag.dy)>5)drag.moved=true;
     drag.tx=clamp(drag.ox+drag.dx,-leftReach,rightReach);
     const taut=Math.sqrt(Math.max(0,rest*rest-drag.tx*drag.tx))-rest;
@@ -259,5 +298,6 @@
   });
   reduced.addEventListener("change",wake);
   new ResizeObserver(measure).observe(rig);
+  document.fonts?.ready.then(measure);
   measure();
 })();

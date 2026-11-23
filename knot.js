@@ -50,11 +50,11 @@
       "float roll=uv.y*5.-uv.x*59.;float twist=cos(6.2832*roll);",
       "float fibre=cos(6.2832*(uv.y*25.-uv.x*132.+.16*sin(6.2832*roll)));",
       "float groove=smoothstep(.05,.99,twist);",
-      "vec3 flax=mix(vec3(.52,.133,.067),vec3(.79,.32,.17),.42+depth*.10);",
+      "vec3 flax=mix(vec3(.43,.064,.065),vec3(.72,.18,.13),.42+depth*.10);",
       "float light=.36+.8*key+.13*max(0.,dot(n,normalize(vec3(.8,-.2,.6))));",
       "vec3 col=flax*light*(.82+.18*groove+.025*fibre);",
-      "col+=vec3(.51,.31,.19)*pow(max(0.,dot(n,normalize(l+v))),18.)*(.26+.74*groove);",
-      "col+=vec3(.33,.15,.09)*edge*(.28+.72*key);gl_FragColor=vec4(col,1.);}"
+      "col+=vec3(.46,.30,.25)*pow(max(0.,dot(n,normalize(l+v))),18.)*(.26+.74*groove);",
+      "col+=vec3(.32,.12,.11)*edge*(.28+.72*key);gl_FragColor=vec4(col,1.);}"
     ].join("\n");
     const program = gl.createProgram();
     for (const [type,source] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]) {
@@ -87,7 +87,7 @@
     };
   }
 
-  let draw, attempted=false, visible=false, reveal=0, frame=0;
+  let draw, armed=false, attempted=false, visible=false, reveal=0, frame=0;
   let w=1,h=1,yaw=-.36,pitch=.22,goalYaw=yaw,goalPitch=pitch;
   function render() {
     frame=0;
@@ -99,25 +99,30 @@
     }
     const blend = reduced.matches ? 1 : .24;
     yaw+=(goalYaw-yaw)*blend; pitch+=(goalPitch-pitch)*blend;
-    const turn=yaw+(reduced.matches?0:(1-reveal)*1.26);
+    const turn=yaw;
     if (draw) draw(pitch,turn,-.32,w,h);
     else fallback.style.transform="rotate("+((turn+.36)*18)+"deg) scaleX("+(.88+.12*Math.cos(turn+.36))+")";
     if (Math.abs(goalYaw-yaw)+Math.abs(goalPitch-pitch)>.003) wake();
   }
-  function wake(){if (!frame && visible && reveal>0 && !document.hidden)frame=requestAnimationFrame(render)}
+  function wake(){if (armed && !frame && visible && reveal>0 && !document.hidden)frame=requestAnimationFrame(render)}
   function resize(){w=button.clientWidth||1;h=button.clientHeight||1;wake()}
   new ResizeObserver(resize).observe(button);
   new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;wake()}).observe(stage);
-  window.addEventListener("film-progress",event=>{reveal=event.detail.knotReveal;wake()});
+  window.addEventListener("film-progress",event=>{const wasVisible=reveal>0;reveal=event.detail.knotReveal;if(!wasVisible && reveal>0)wake()});
   reveal=stage.dataset.knotVisible==="true"?1:0;
   document.addEventListener("visibilitychange",wake);
   canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();draw=null;button.dataset.render="poster";wake()});
   canvas.addEventListener("webglcontextrestored",()=>{attempted=false;wake()});
 
+  // Scrolling uses a still rendered from this mesh. Initialise the renderer on interaction.
+  button.dataset.render="poster";
+  function arm(){armed=true;wake()}
+  button.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse" && reveal>.995)arm()});
+  button.addEventListener("focus",arm);
   let gesture=null, suppressClick=false;
   button.addEventListener("pointerdown",e=>{
     if (!e.isPrimary || e.button!==0) return;
-    suppressClick=false;
+    arm();suppressClick=false;
     gesture={id:e.pointerId,x:e.clientX,y:e.clientY,pitch:goalPitch,yaw:goalYaw,dragging:false};
     button.setPointerCapture(e.pointerId);
   });
@@ -133,12 +138,12 @@
   function end(e){if (gesture&&gesture.id===e.pointerId){suppressClick=gesture.dragging;gesture=null}}
   button.addEventListener("pointerup",end);button.addEventListener("lostpointercapture",end);
   button.addEventListener("click",e=>{
-    if (!suppressClick || e.detail===0){goalYaw+=tau/5;wake()}
+    arm();if (!suppressClick || e.detail===0){goalYaw+=tau/5;wake()}
     suppressClick=false;
   });
   button.addEventListener("keydown",e=>{
     if (e.key!=="ArrowLeft" && e.key!=="ArrowRight") return;
-    e.preventDefault();goalYaw+=e.key==="ArrowLeft"?-.42:.42;wake();
+    e.preventDefault();arm();goalYaw+=e.key==="ArrowLeft"?-.42:.42;wake();
   });
   resize();
 })();
