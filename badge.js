@@ -12,6 +12,7 @@
       <use href="#rig-thread" stroke="#73716a" stroke-width="8"/>
       <use href="#rig-thread" stroke="#242421" stroke-width="6.2"/>
       <use href="#rig-thread" stroke="#979087" stroke-width="3.6" stroke-dasharray="0.75 3.5" opacity=".75"/>
+      <use class="badge-stitch" href="#rig-thread" stroke="#ded8c9" stroke-width="1.1" stroke-dasharray="1 7 3 7" opacity=".82"/>
     </g><g class="badge-anchor"><rect x="-8" y="-2" width="16" height="6" rx="2" fill="#57554f" stroke="#8e8c84" stroke-width=".8"/><circle cx="-5.7" cy="1" r=".8" fill="#141413"/><circle cx="5.7" cy="1" r=".8" fill="#141413"/></g></svg>
     <div class="badge-layer"><div class="badge-mount"><div class="badge-body" role="group" tabindex="0" aria-label="何星霆的求职挂牌，正面个人简介，背面服务客户。按空格翻面，方向键甩动">
       <i class="badge-edge" aria-hidden="true"></i><div class="badge-face badge-front">
@@ -54,28 +55,36 @@
   // The fixed socket and the moving snap hook constrain the two ends of
   // a chain of short, inextensible spans. Interior knots retain momentum.
   const knots=Array.from({length:12},()=>({x:0,y:0,px:0,py:0}));
-  let halfTurn=0,anchor=0,rest=0,leftReach=0,rightReach=0,strandLength=0;
+  let halfTurn=0,anchor=0,rest=0,leftReach=0,rightReach=0,strandLength=0,metalScale=1;
+  let scenePhase=0,previousPhase=0;
   let drag=null,visible=true,frame=0,last=0,didEnter=false,resetCord=true,lastTap=-1000;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const restYaw=()=>halfTurn*180-6;
+  const restYaw=()=>halfTurn*180-7+scenePhase*16;
+  const restRoll=()=>-6+scenePhase*7;
+  const restX=()=>Math.sin(scenePhase*Math.PI)*Math.min(30,rest*.11);
 
   function measure() {
     const w=rig.clientWidth,h=rig.clientHeight,bh=body.offsetHeight,bw=body.offsetWidth;
     anchor=w/2;
     socket.setAttribute("transform","translate(" + (anchor-8) + " 0)");
-    rest=Math.max(42,Math.min(300,h*.43,h-bh-47));
+    metalScale=clamp(bw/228,.74,2);
+    rest=Math.max(42,Math.min(h*.43,h-bh-48));
     const centre=rig.getBoundingClientRect().left+anchor;
     leftReach=Math.max(22,Math.min(rest*.96,centre-bw*.52-8));
     rightReach=Math.max(22,Math.min(rest*.96,innerWidth-centre-bw*.52-8));
-    strandLength=Math.hypot(8+32*Math.sin(-6*Math.PI/180),rest-32*Math.cos(-6*Math.PI/180)+5)*1.006;
+    strandLength=Math.hypot(8+32*metalScale*Math.sin(-6*Math.PI/180),rest-32*metalScale*Math.cos(-6*Math.PI/180)+5)*1.006;
+    rig.querySelectorAll(".badge-cord use").forEach(use=>{
+      if(!use.dataset.baseWidth)use.dataset.baseWidth=use.getAttribute("stroke-width");
+      use.setAttribute("stroke-width",Number(use.dataset.baseWidth)*metalScale);
+    });
     resetCord=true;
     rig.style.setProperty("--badge-label-top", Math.round(rest+bh+7)+"px");
     rig.querySelectorAll(".badge-cord,.badge-hardware").forEach(svg=>svg.setAttribute("viewBox","0 0 "+w+" "+h));
     if(!didEnter && w>0 && h>0) {
       didEnter=true;
       if(!reduced.matches) Object.assign(state,{
-        x:-Math.min(leftReach*.65,95),y:-Math.min(rest*.62,176),
-        angle:23,pitch:-32,yaw:-72,vx:125,vy:180,vp:80,vz:116
+        x:-Math.min(leftReach*.82,172),y:-Math.min(rest*.74,250),
+        angle:42,pitch:-42,yaw:-106,vx:155,vy:260,vp:110,vz:160
       });
     }
     paint(0);wake();
@@ -126,35 +135,36 @@
   function paint(dt) {
     const x=anchor+state.x, y=rest+state.y;
     const angle=state.angle*Math.PI/180;
-    const endX=x+32*Math.sin(angle),endY=y-32*Math.cos(angle);
+    const endX=x+32*metalScale*Math.sin(angle),endY=y-32*metalScale*Math.cos(angle);
     const energy=stepRope(anchor-8,-5,endX,endY,dt);
     mount.style.transform=`translate3d(${x}px,${y}px,0)`;
     body.style.transform=`rotateZ(${state.angle}deg) rotateY(${state.yaw}deg) rotateX(${state.pitch}deg)`;
     body.style.setProperty("--glaze",(Math.sin(state.yaw*Math.PI/180)*22+state.pitch*.18).toFixed(2)+"%");
-    clip.setAttribute("transform",`translate(${x} ${y}) rotate(${state.angle})`);
+    clip.setAttribute("transform",`translate(${x} ${y}) rotate(${state.angle}) scale(${metalScale})`);
     return energy;
   }
   function wake(){if(!frame && visible && !document.hidden)frame=requestAnimationFrame(tick)}
   function tick(now){
     frame=0;
     const dt=last?Math.min(.025,Math.max(.001,(now-last)/1000)):1/60;last=now;
-    const targetX=drag?drag.tx:0;
+    const targetX=drag?drag.tx:restX();
     const targetY=drag?drag.ty:Math.sqrt(Math.max(0,rest*rest-state.x*state.x))-rest;
-    const targetAngle=-6-Math.atan2(state.x,Math.max(38,rest+state.y))*46-state.vx*.05+(drag?drag.grip*drag.dy*.11:0);
+    const targetAngle=restRoll()-Math.atan2(state.x,Math.max(38,rest+state.y))*54-state.vx*.056+(drag?drag.grip*drag.dy*.14:0);
     const targetPitch=drag?drag.pitch:clamp(-state.vy*.054+state.vx*.019,-30,30);
     const targetYaw=drag?drag.yaw:restYaw();
-    const motions=[["x","vx",targetX,drag?930:51,drag?53:4.5],["y","vy",targetY,drag?930:82,drag?53:6.8],
-      ["angle","va",clamp(targetAngle,-55,55),85,8.8],["pitch","vp",targetPitch,drag?210:78,drag?21:7],
-      ["yaw","vz",targetYaw,drag?235:64,drag?22:9.3]];
+    const motions=[["x","vx",targetX,drag?1000:35,drag?56:3.75],["y","vy",targetY,drag?1000:91,drag?56:6.6],
+      ["angle","va",clamp(targetAngle,-62,62),96,7.2],["pitch","vp",targetPitch,drag?235:78,drag?22:6.9],
+      ["yaw","vz",targetYaw,drag?255:46,drag?23:7.1]];
     let settled=true;
     for(const [pos,vel,target,k,damping] of motions){
-      if(reduced.matches){state[pos]=pos==="angle"?-6:pos==="pitch"?0:target;state[vel]=0;continue}
+      if(reduced.matches){state[pos]=pos==="angle"?restRoll():pos==="pitch"?0:target;state[vel]=0;continue}
       state[vel]+=(k*(target-state[pos])-damping*state[vel])*dt;
       state[pos]+=state[vel]*dt;
       if(Math.abs(target-state[pos])>.07 || Math.abs(state[vel])>.7)settled=false;
     }
     if(settled && !drag) {
-      Object.assign(state,{x:0,y:0,angle:-6,pitch:0,yaw:restYaw(),vx:0,vy:0,va:0,vp:0,vz:0});
+      Object.assign(state,{x:targetX,y:Math.sqrt(Math.max(0,rest*rest-targetX*targetX))-rest,
+        angle:restRoll()-Math.asin(clamp(targetX/rest,-1,1))*54,pitch:0,yaw:restYaw(),vx:0,vy:0,va:0,vp:0,vz:0});
     }
     const ropeMotion=paint(dt);
     if(!settled || ropeMotion>.12)wake();else last=0;
@@ -203,7 +213,7 @@
     drag.vx=drag.vx*.3+.7*clamp((e.clientX-drag.lastX)*1000/ms,-1600,1600);
     drag.vy=drag.vy*.3+.7*clamp((e.clientY-drag.lastY)*1000/ms,-1100,1100);
     drag.lastX=e.clientX;drag.lastY=e.clientY;drag.time=e.timeStamp;
-    drag.yaw=drag.baseYaw+clamp(drag.dx*(1.08+.25*Math.abs(drag.grip)),-200,200);
+    drag.yaw=drag.baseYaw+clamp(drag.dx*(1.05+.42*Math.abs(drag.grip)),-234,234);
     drag.pitch=clamp(-drag.dy*.47+drag.grip*drag.dx*.095,-54,54);
     wake();
   });
@@ -219,8 +229,8 @@
     else if(!cancelled){
       const carry=e.timeStamp-old.time<130?1:0;
       const v=old.vx*carry;
-      state.vx=clamp(v*.59,-680,680);state.vy=clamp(old.vy*carry*.48,-380,380);
-      state.vz=clamp(v*.72,-900,900);state.vp=clamp(-old.vy*carry*.38,-340,340);
+      state.vx=clamp(v*.68,-820,820);state.vy=clamp(old.vy*carry*.61,-470,470);
+      state.vz=clamp(v*.94,-1140,1140);state.vp=clamp(-old.vy*carry*.45,-400,400);
       if(Math.abs(old.dx)>58 || Math.abs(v)>420) {
         const travel=old.yaw-restYaw()+v*.22;
         const turns=clamp(Math.round(travel/180),-3,3) || Math.sign(old.dx || v);
@@ -237,6 +247,16 @@
     visible=entry.isIntersecting;if(visible)wake();else pause();
   }).observe(rig);
   document.addEventListener("visibilitychange",()=>document.hidden?pause():wake());
+  window.addEventListener("film-progress",e=>{
+    const p=Number(e.detail?.progress);
+    if(!Number.isFinite(p))return;
+    scenePhase=reduced.matches?0:clamp(p,0,1);
+    if(Math.abs(scenePhase-previousPhase)<.003 && scenePhase!==0 && scenePhase!==1)return;
+    if(previousPhase===scenePhase)return;
+    if(!drag && !reduced.matches && visible)
+      state.vx+=clamp((scenePhase-previousPhase)*270,-50,50);
+    previousPhase=scenePhase;wake();
+  });
   reduced.addEventListener("change",wake);
   new ResizeObserver(measure).observe(rig);
   measure();
